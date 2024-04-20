@@ -1,70 +1,44 @@
-# Getting Started with Create React App
+# Front End Setup for ASR Project
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+Quickly set up the front-end part of the ASR project by following these steps. This guide includes installing Node Version Manager (nvm), using a specific Node.js version, and starting the project.
 
-## Available Scripts
+## Setup Instructions
 
-In the project directory, you can run:
+### Installing NVM and Node.js
 
-### `npm start`
+1. **Install NVM (Node Version Manager):**
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+   - **Linux/macOS:**
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+     Open your terminal and run:
 
-### `npm test`
+     ```bash
+     curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.1/install.sh | bash
+     ```
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+     Or, if you prefer `wget`, use:
 
-### `npm run build`
+     ```bash
+     wget -qO- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.1/install.sh | bash
+     ```
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+     Restart your terminal or run:
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+     ```bash
+     export NVM_DIR="$([ -z "${XDG_CONFIG_HOME-}" ] && printf %s "${HOME}/.nvm" || printf %s "${XDG_CONFIG_HOME}/nvm")"
+     [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh" # This loads nvm
+     ```
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+   - **Windows:**
 
-### `npm run eject`
+     Download and run the `nvm-setup.zip` installer from [nvm-windows releases](https://github.com/coreybutler/nvm-windows/releases).
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+2. **Install and Use Node.js 16.20.2:**
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+   Once `nvm` is installed, close and reopen your terminal, then run:
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
-
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
-
-### Code Splitting
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
-
-### Analyzing the Bundle Size
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+   ```bash
+   nvm install 16.20.2
+   nvm use 16.20.2
+  ```
+https://www.youtube.com/watch?v=BhLFxy6Jz8c
