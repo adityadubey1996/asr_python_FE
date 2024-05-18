@@ -1,19 +1,81 @@
-import React from "react";
+import React, {useState} from "react";
 import TextField from "@mui/material/TextField";
 import ActivityTable from "./ActivityTable";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faFileUpload } from "@fortawesome/free-solid-svg-icons";
 import RecentRecordings from "./RecentRecordings";
+import io from 'socket.io-client';
 
+const socket = io('http://127.0.0.1:5005', { transports: ['websocket'] });
 const ActivityDashBoard = () => {
+  const [file, setFile] = useState(null);
+  const [uploadStatus, setUploadStatus] = useState('');
+
+
+
+
+
+  // const handleFileUploadClick = () => {
+  //   document.getElementById("fileInput").click();
+  // };
+
+  // const handleFileInputChange = (e) => {
+  //   const file = e.target.files[0];
+  //   console.log("Selected file:", file);
+  // };
   const handleFileUploadClick = () => {
     document.getElementById("fileInput").click();
   };
 
   const handleFileInputChange = (e) => {
     const file = e.target.files[0];
-    console.log("Selected file:", file);
+    setFile(file);
+    if (file) {
+      uploadFile(file);
+    }
   };
+
+  const uploadFile = (file) => {
+    const CHUNK_SIZE = (1024 * 1024)/2; // 1MB chunk sizes
+    let offset = 0;
+    const fileId = Date.now(); // or generate a unique ID in another way
+
+    // First, signal the start of the upload
+    socket.emit('start_upload', { fileName: file.name });
+
+    const readSlice = o => {
+      const slice = file.slice(offset, o + CHUNK_SIZE);
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        socket.emit('upload_chunk', {
+          chunk: e.target.result,
+          fileName: file.name,
+          fileId: fileId
+        });
+      };
+      reader.readAsArrayBuffer(slice);
+    };
+
+    socket.on('chunk_ack', () => {
+      if (offset < file.size) {
+        offset += CHUNK_SIZE;
+        readSlice(offset);
+        setUploadStatus(`Uploading... ${Math.min((offset / file.size) * 100, 100).toFixed(2)}%`);
+      } else {
+        socket.emit('end_upload', { fileName: file.name, fileId: fileId });
+        setUploadStatus('Upload completed');
+      }
+    });
+
+    readSlice(0);
+  };
+
+ 
+
+
+
+ 
+
 
   return (
     <div className="w-full">
@@ -47,6 +109,9 @@ const ActivityDashBoard = () => {
             />
           </h1>
         </div>
+        <div>
+        {uploadStatus && <p>{uploadStatus}</p>}
+      </div>
       </div>
       <RecentRecordings />
     </div>

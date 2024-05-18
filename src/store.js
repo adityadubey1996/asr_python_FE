@@ -1,8 +1,10 @@
 import { configureStore } from "@reduxjs/toolkit";
-import userReducer from './reducers/auth.reducer'
+import userReducer from './reducers/auth.reducer';
+import questionResucer from './reducers/metric.reducer';
 
 export const store = configureStore({
     reducer :{
-        user : userReducer
+        user : userReducer,
+        metrics: questionResucer
     }
 })
