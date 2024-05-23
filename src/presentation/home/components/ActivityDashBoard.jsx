@@ -6,7 +6,10 @@ import { faFileUpload } from "@fortawesome/free-solid-svg-icons";
 import RecentRecordings from "./RecentRecordings";
 import io from 'socket.io-client';
 
-const socket = io('http://127.0.0.1:5005', { transports: ['websocket'] });
+// const socket = io('http://127.0.0.1:5005', { transports: ['websocket'] });
+
+const socket = null
+
 const ActivityDashBoard = () => {
   const [file, setFile] = useState(null);
   const [uploadStatus, setUploadStatus] = useState('');
