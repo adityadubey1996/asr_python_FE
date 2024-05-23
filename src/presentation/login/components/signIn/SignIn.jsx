@@ -42,7 +42,7 @@ const SignUp = ({ setSignIn }) => {
         dispatch(userLoginSuccess(res.data));
         localStorage.setItem("user", JSON.stringify(res.data));
         cookies.set("x-auth-token", res.data.data.access_token, { path: "/" });
-        navigate("/main");
+        navigate("/");
       }
     } catch (error) {
       setError(error.response.data.data);
