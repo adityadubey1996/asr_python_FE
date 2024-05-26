@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { getUserMetrics } from "../../../reducers/metric.reducer";
 import { Card, CardContent, Typography, CircularProgress } from "@mui/material";
 import { grey } from "@mui/material/colors";
@@ -8,6 +8,8 @@ const Workflow = () => {
   const dispatch = useDispatch();
   const [userMetrics, setUserMetrics] = useState([]);
   const [loading, setLoading] = useState(true);
+
+  const metrics = useSelector(state=> state.metrics.userMetrics)
 
   useEffect(() => {
     async function fetchData() {
@@ -25,7 +27,13 @@ const Workflow = () => {
         setLoading(false);
       }
     }
-    fetchData();
+    if(metrics){
+      console.log(metrics[0])
+      setUserMetrics(JSON.parse(metrics[0].customSettings))
+      setLoading(false)
+    } else {
+      fetchData();
+    }
   }, [dispatch]);
 
   return (
@@ -33,9 +41,7 @@ const Workflow = () => {
       <Typography
         variant="h5"
         component="h2"
-        className="mb-4"
-        
-        sx={{ color: grey[300] , fontWeight :'bold' }}
+        sx={{ color: grey[300], fontWeight: "bold" }}
       >
         Workflow
       </Typography>
@@ -60,15 +66,16 @@ const Workflow = () => {
             </div>
           ) : (
             userMetrics.map((question, index) => (
-              <div key={index} className="mb-4 p-4 rounded-lg bg-gray-900">
+              <div
+                key={index}
+                className="mb-4 p-4 rounded-lg bg-gray-900"
+              >
                 <Typography
                   variant="subtitle1"
                   className="font-medium mb-1"
                   sx={{ color: grey[300] }}
                 >
-                  <span className="text-yellow-400">
-                    Question {index + 1}:{" "}
-                  </span>
+                  <span className="text-yellow-400">Question {index + 1}: </span>
                   {question.question}
                 </Typography>
                 <Typography variant="body1" className="text-gray-300">

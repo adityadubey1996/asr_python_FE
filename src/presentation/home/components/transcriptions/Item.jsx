@@ -15,6 +15,7 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import { FormatSize } from "@mui/icons-material";
 import { red ,grey } from "@mui/material/colors";
+import { getFileExtensionFromURL, getFileNameFromURL } from "../../../../utils/functions";
 
 const Item = ({ item, onShowTranscription }) => {
   return (
@@ -24,15 +25,15 @@ const Item = ({ item, onShowTranscription }) => {
         <div>
           {" "}
           <span className="mr-4 font-semibold text-gray-200">
-            {item.fileName}
+            {getFileNameFromURL(item.fileUrl)}
           </span>
           <div>
             <span className="mr-4 text-gray-500">
-              <FontAwesomeIcon icon={FormatSize} /> {item.size}
+              {/* <FontAwesomeIcon icon={FormatSize} /> {getFileSize(item.fileUrl)} */}
             </span>
             <span className="mr-4 text-gray-500">
               <FontAwesomeIcon icon={faGlobe} />
-              &nbsp; {item.language}
+              &nbsp; {getFileExtensionFromURL(item.fileUrl)}
             </span>
             <span className="mr-4 text-gray-500">
               <FontAwesomeIcon icon={faUser} />
@@ -46,6 +47,7 @@ const Item = ({ item, onShowTranscription }) => {
         </div>
       </div>
       <div className="flex items-center space-x-2">
+        <h1 className="text-white">{item.status}</h1>
         <Button
           variant="contained"
           size="small"
