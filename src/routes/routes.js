@@ -8,24 +8,19 @@ import {
 import { useSelector } from "react-redux";
 import Login from "../presentation/login/Login";
 import Home from "../presentation/home/Home";
-import Questionnaire  from "../presentation/questionnaire";
+import Questionnaire from "../presentation/questionnaire";
 
 const Routing = () => {
   const user = useSelector((state) => state.user.user);
-  const userAnswers = useSelector((state) => state.metrics)
+  const userAnswers = useSelector((state) => state.metrics);
 
   const isUserLoggedIn = () => {
-    if (user.data) {
-      return true;
-    } else {
-      return false;
-    }
+    return !!user.data;
   };
 
-  const isQuestionnaireComplete = () =>{
-    return true
-    // return answers && Object.keys(answers).length > 0;
-  }
+  const isQuestionnaireComplete = () => {
+    return user.metricsExist;
+  };
 
   return (
     <Router>
@@ -33,19 +28,20 @@ const Routing = () => {
         <Route
           path="/"
           element={
-            isUserLoggedIn() ? 
-                              isQuestionnaireComplete() ? 
-                                                      (<Navigate to = '/questions' replace/>):
-                                                      ( <Navigate to="/main" replace />)
-            : (
+            isUserLoggedIn() ? (
+              !isQuestionnaireComplete() ? (
+                <Navigate to="/questions" replace />
+              ) : (
+                <Navigate to="/main" replace />
+              )
+            ) : (
               <Navigate to="/login" replace />
             )
           }
         />
-                <Route path="/questions" element={<Questionnaire />} />
+        <Route path="/questions" element={<Questionnaire />} />
 
-        
-        <Route path="/login" element={<Login />}></Route>
+        <Route path="/login" element={<Login />} />
         <Route path="/main" element={<Home />} />
       </Routes>
     </Router>

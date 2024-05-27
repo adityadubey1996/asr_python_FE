@@ -26,14 +26,14 @@ const Sidebar = ({ selectedItem, setSelectedItem, sidebarItems }) => {
   const user = useSelector((state) => state.user.user.data);
 
   return (
-    <div className="bg-[#f8f8f8]">
-      <div className="border h-screen flex flex-col gap-5 border-gray-200">
+    <div className="bg-gray-900">
+      <div className="border h-screen flex flex-col gap-5 border-gray-800">
         <div>
-          <h1 className="font-bold px-5 pt-8 pb-1 font-sans lg:text-lg">
+          <h1 className="font-bold px-5 pt-8 pb-1 font-sans text-gray-100 lg:text-lg">
             {" "}
             Private Workspace
           </h1>
-          <h1 className="font-medium text-xs px-5 text-lighttextGray">
+          <h1 className="font-medium text-xs px-5 text-gray-300">
             {user.email}
           </h1>
         </div>
@@ -42,13 +42,13 @@ const Sidebar = ({ selectedItem, setSelectedItem, sidebarItems }) => {
             <div
               key={index}
               onClick={() => setSelectedItem(x.title)}
-              className="flex hover:bg-slate-200 py-3 px-4 cursor-pointer items-center"
+              className="flex hover:bg-gray-800 py-3 px-4 cursor-pointer items-center"
             >
               <span
                 className={
                   selectedItem === x.title
-                    ? "text-blue-500"
-                    : "text-headingColor"
+                    ? "text-gray-300"
+                    : "text-gray-300"
                 }
                 style={{ width: "2rem" }}
               >
@@ -57,8 +57,8 @@ const Sidebar = ({ selectedItem, setSelectedItem, sidebarItems }) => {
               <div
                 className={
                   selectedItem === x.title
-                    ? "text-blue-500 font-sans font-bold"
-                    : "text-headingColor font-sans"
+                    ? "text-gray-100 font-sans font-bold"
+                    : "text-gray-300 font-sans"
                 }
               >
                 {x.title}

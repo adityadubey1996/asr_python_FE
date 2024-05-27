@@ -5,6 +5,8 @@ import Routing from "./routes/routes";
 import { Provider } from "react-redux";
 import { store } from "./store";
 import './input.css'
+import axios from "axios";
+axios.defaults.withCredentials=true
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(

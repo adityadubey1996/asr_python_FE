@@ -1,39 +1,57 @@
-import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import baseUrl from '../utils/url'
+import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
+import baseUrl from "../utils/url";
+import axios from "axios";
 
-export const fetchQuestions = createAsyncThunk('metrics/fetchQuestions', async () => {
-  const response = await fetch(`${baseUrl()}/api/metric/questions`);
-  if (response.ok) {
-    const data = await response.json();
-    return data;
+export const fetchQuestions = createAsyncThunk(
+  "metrics/fetchQuestions",
+  async () => {
+    const response = await fetch(`${baseUrl()}/api/metric/questions`);
+    if (response.ok) {
+      const data = await response.json();
+      return data;
+    }
+    throw new Error("Failed to fetch questions");
   }
-  throw new Error('Failed to fetch questions');
-});
+);
 
 export const saveAnswers = createAsyncThunk(
-  'metrics/saveAnswers',
-  async ({ userId, answers }, { rejectWithValue }) => {
+  "metrics/saveAnswers",
+  async ({ answers }, { rejectWithValue }) => {
     try {
-      const response = await fetch(`${baseUrl()}/api/metric/answers/${userId}`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ answers })
-      });
-      if (response.ok) {
+      const response = await axios.post(
+        `${baseUrl()}/api/metrics/user-metrics`,
+        answers
+      );
+      if (response.status == 200) {
         return answers;
       }
-      throw new Error('Failed to save answers');
     } catch (error) {
       return rejectWithValue(error.toString());
     }
   }
 );
 
+export const getUserMetrics = createAsyncThunk(
+  "metrics/getMetrics",
+  async () => {
+    const response = await axios.get(`${baseUrl()}/api/metrics/userMetrics`);
+    try {
+      if (response.status === 200) {
+        return response.data;
+      }
+      throw new Error("Failed to get metrics");
+    } catch (error) {
+      console.log("something went wrong");
+    }
+  }
+);
+
 const metricsSlice = createSlice({
-  name: 'metrics',
+  name: "metrics",
   initialState: {
     questions: [],
     userAnswers: {},
+    userMetrics: "",
     loading: false,
     error: null,
   },
@@ -54,7 +72,15 @@ const metricsSlice = createSlice({
       .addCase(saveAnswers.fulfilled, (state, action) => {
         state.userAnswers = action.payload;
       });
-  }
+      builder
+      .addCase(getUserMetrics.fulfilled, (state, action) => {
+        state.userMetrics = action.payload;
+        state.loading = false;
+      })
+      .addCase(getUserMetrics.pending, (state, action) => {
+        state.loading = true;
+      });
+  },
 });
 
 export default metricsSlice.reducer;
