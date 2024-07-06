@@ -12,6 +12,7 @@ import {
 import { grey } from "@mui/material/colors";
 
 export const FilePreview = ({ selectedFile }) => {
+  console.log('selectedFile from FilePreview',selectedFile )
   return (
     <>
       <div style={{ flex: 1, padding: "1rem" }}>

@@ -1,11 +1,15 @@
 import React, { useEffect } from "react";
 import GoogleLogin from "react-google-login";
 import { gapi } from "gapi-script";
-import axios from "axios";
+import axios from '../../../utils/axios-interceptor';
+// import axios from 'axios'
 import baseUrl from "../../../utils/url";
 import { useDispatch } from "react-redux";
-import { userLoginSuccess } from "../../../reducers/auth.reducer";
-import { useNavigate } from "react-router";
+import { userLoginFailure, userLoginSuccess } from "../../../reducers/auth.reducer";
+import { getUserMetrics,  } from "../../../reducers/metric.reducer";
+
+
+import { useNavigate } from "react-router-dom";
 import Cookies from "universal-cookie";
 
 const Google = () => {
@@ -13,15 +17,29 @@ const Google = () => {
   const navigate = useNavigate();
   const cookies = new Cookies();
   const onSuccessResponse = async (res) => {
+    console.log('res from onSuccessResponse', res.tokenId)
     axios
       .post(baseUrl() + "/api/google-login", { tokenId: res.tokenId })
       .then((res) => {
         dispatch(userLoginSuccess(res.data));
         localStorage.setItem("user", JSON.stringify(res.data));
-        cookies.set("x-auth-token", res.data.data.access_token, { path: "/" });
-        navigate("/");
+        cookies.set("auth-token", res.data.data.access_token, { path: "/" });
+        console.log('res.data.data.access_token', res.data.data.access_token)
+        dispatch(getUserMetrics()).then((data) => {
+          console.log('data from handleSignIn', data)
+          if(data && data.payload && Array.isArray(data.payload) && data.payload.length > 0){
+            navigate('/main')
+          }
+          else{
+            navigate('/questions')
+          }
+                  }).catch((e) => {
+                    console.log('error from handleSignIn', e)
+                  })
       })
-      .catch((err) => console.log(err));
+      .catch((err) => {console.log(err)
+      dispatch(userLoginFailure(err))
+      });
   };
   const onFailureResponse = (res) => {
     if (res.error === "popup_closed_by_user") {

@@ -1,5 +1,5 @@
 // Item.js
-import React from "react";
+import React, {useState} from "react";
 import Checkbox from "@mui/material/Checkbox";
 import IconButton from "@mui/material/IconButton";
 import EditIcon from "@mui/icons-material/Edit";
@@ -18,6 +18,12 @@ import { red ,grey } from "@mui/material/colors";
 import { getFileExtensionFromURL, getFileNameFromURL } from "../../../../utils/functions";
 
 const Item = ({ item, onShowTranscription }) => {
+  const [showFullFilename, setShowFullFilename] = useState(false);
+
+  const truncateFilename = (filename, length) => {
+    return filename.length > length ? `${filename.substring(0, length)}...` : filename;
+  };
+
   return (
     <div className="flex items-center p-4 mb-4 border border-gray-800 rounded-lg bg-gray-800">
       <Checkbox className="mr-4" style={{color : grey[100]}}/>
@@ -25,8 +31,12 @@ const Item = ({ item, onShowTranscription }) => {
         <div>
           {" "}
           <span className="mr-4 font-semibold text-gray-200">
-            {getFileNameFromURL(item.fileUrl)}
+          {showFullFilename ? getFileNameFromURL(item.fileUrl) : truncateFilename(getFileNameFromURL(item.fileUrl), 20)}
+            {/* {getFileNameFromURL(item.fileUrl)} */}
           </span>
+          <button onClick={() => setShowFullFilename(!showFullFilename)} className="text-blue-500 hover:text-blue-700 text-sm">
+            {showFullFilename ? 'Show Less' : 'Read More'}
+          </button>
           <div>
             <span className="mr-4 text-gray-500">
               {/* <FontAwesomeIcon icon={FormatSize} /> {getFileSize(item.fileUrl)} */}
@@ -48,13 +58,14 @@ const Item = ({ item, onShowTranscription }) => {
       </div>
       <div className="flex items-center space-x-2">
         <h1 className="text-white">{item.status}</h1>
-        <Button
+        {item && item.status === 'uploaded' && <Button
           variant="contained"
           size="small"
           onClick={() => onShowTranscription(item.id)}
         >
-          Show Transcriptions
-        </Button>
+          Start Transcriptions
+        </Button>}
+        
 
         <Tooltip title="Delete">
           <IconButton size="small">

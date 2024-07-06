@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect } from "react";
 import Item from "./Item";
+import { useSelector } from "react-redux";
 import Typography from "@mui/material/Typography";
 import Container from "@mui/material/Container";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -7,7 +8,7 @@ import { faEdit } from "@fortawesome/free-regular-svg-icons";
 import { Divider, Box, Button, Paper, Modal } from "@mui/material";
 import UploadIcon from "@mui/icons-material/Upload";
 import io from "socket.io-client";
-import axios from "axios";
+import axios from "../../../../utils/axios-interceptor";
 import baseUrl from "../../../../utils/url";
 import ReactPlayer from "react-player";
 import { FilePreview, Metrics } from "./ModalData";
@@ -15,10 +16,14 @@ import Workflow from "../Workflow";
 
 const Transcriptions = () => {
   const [socket, setSocket] = useState(null);
-  const [uploadedFiles, setUploadFiles] = useState([]);
+  const [fileList, setFileList] = useState([]);
   const [selectedFile, setSelectedFile] = useState("");
+  const [onUploadClick, setOnUploadClick] = useState(false)
   const fileInputRef = useRef(null);
   const [modalIndex, setModalIndex] = useState(0);
+  const [fileIdUploading, setFileIdUploading] = useState(null)
+  const[uploadPercentage, setUploadPercentage] = useState(null)
+  const token = useSelector((state) => state?.user?.userData?.access_token)
 
   const showModalContent = () => {
     if (modalIndex === 0 && selectedFile) {
@@ -32,7 +37,8 @@ const Transcriptions = () => {
   const getFiles = async () => {
     const res = await axios.get(`${baseUrl()}/api/audio-files`);
     if (res.status === 200) {
-      setUploadFiles(res.data);
+    
+      setFileList(res.data);
     } else {
       alert("Something went wrong");
     }
@@ -40,10 +46,19 @@ const Transcriptions = () => {
 
   useEffect(() => {
     getFiles();
-    const newSocket = io("http://localhost:5005");
+    if(!token){
+      alert('File Upload not available')
+      return;
+    }
+    // const newSocket = null
+    const newSocket = io("http://localhost:5005",{
+      query: { token }
+  });
     setSocket(newSocket);
     return () => {
+      if(newSocket){
       newSocket.disconnect();
+      }
     };
   }, []);
 
@@ -59,9 +74,10 @@ const Transcriptions = () => {
       console.log("Reconnected to server");
     });
 
-    socket.on("chunk_ack", async (data) => {
+    socket.on("upload_success", async (data) => {
+      console.log('data from upload_success', data)
       try {
-        const res = await axios.patch(`${baseUrl()}/api/audio-file`, {
+        const res = await axios.post(`${baseUrl()}/api/update-audio-file`, {
           fileUrl: data.url,
           fileId: data.fileId,
           status: "uploaded",
@@ -74,9 +90,14 @@ const Transcriptions = () => {
       }
     });
 
+  
     socket.on("error", (error) => {
       console.error("Socket error:", error);
     });
+
+    socket.on('chunk_ack', () => {
+      console.log('chunk_ack')
+    })
 
     return () => {
       socket.off("connect");
@@ -97,14 +118,15 @@ const Transcriptions = () => {
   const handleFileChange = (event) => {
     setSelectedFile(event.target.files[0]);
     event.target.value = null;
+    setOnUploadClick(true)
   };
 
   const handleNext = () => {
-    // setSelectedFile(null);
+
     if(modalIndex === 1){
+      setOnUploadClick(false)
       uploadFile(selectedFile)
       setModalIndex(null)
-      setSelectedFile(null)
     } else {
       setModalIndex(modalIndex + 1);
     }
@@ -117,11 +139,26 @@ const Transcriptions = () => {
   }
 
   const uploadFile = async (file) => {
-    const res = await axios.post(`${baseUrl()}/api/audio-file`, {
-      status: "processing",
-    });
-    await getFiles();
-    if (res.status === 200) {
+    const response = await axios.post(`${baseUrl()}/api/audio-file`, { status: "processing" });
+    if(response.status === 200 && response.data){
+    setFileIdUploading(response.data.fileId)
+    setFileList((prev) => 
+      
+      [...prev, response.data]
+    )
+
+    socket.emit('start_upload', { fileName: file.name, fileId: response.data.fileId });
+    }
+    
+  }
+
+ 
+
+
+ 
+
+  const startChunkUpload = async (file, fileId) => {
+  if(fileId && file){
       const CHUNK_SIZE = 512 * 1024;
       const reader = new FileReader();
       reader.onload = () => {
@@ -129,7 +166,7 @@ const Transcriptions = () => {
         socket.emit("upload_chunk", {
           chunk,
           fileName: file.name,
-          fileId: res.data.fileId,
+          fileId: fileId,
         });
 
         if (reader.readyState !== FileReader.DONE) {
@@ -143,8 +180,31 @@ const Transcriptions = () => {
         }
       };
       reader.readAsArrayBuffer(file.slice(0, CHUNK_SIZE));
-    }
+  }
+  else{
+    console.error('error while uploading file')
+  }
   };
+
+  useEffect(() => {
+    if (!socket) return;
+    socket.on('start_ack', () => {
+      startChunkUpload(selectedFile, fileIdUploading)})
+
+    socket.on('chunk_did_not_received', () => {
+      console.log('upload failed')
+      setFileIdUploading(null)
+      setSelectedFile(null)
+      alert('failed to upload file to server')
+    })
+    socket.on('upload_failed', () => {
+      console.log('upload failed')
+      setFileIdUploading(null)
+      setSelectedFile(null)
+      alert('failed to upload file to server')
+    })
+
+      },[selectedFile, fileIdUploading, socket])
 
   return (
     <Container maxWidth="lg" className="p-4">
@@ -159,6 +219,7 @@ const Transcriptions = () => {
             <FontAwesomeIcon icon={faEdit} /> Transcriptions
           </Typography>
           <Button
+            
             variant="contained"
             color="primary"
             startIcon={<UploadIcon />}
@@ -166,9 +227,11 @@ const Transcriptions = () => {
           >
             Upload
           </Button>
+         
         </Box>
         <input
           type="file"
+          accept="audio/*,video/*"
           ref={fileInputRef}
           style={{ display: "none" }}
           onChange={handleFileChange}
@@ -176,20 +239,22 @@ const Transcriptions = () => {
       </form>
       <Divider />
       <br />
-      {uploadedFiles.length === 0
+      {fileList && Array.isArray(fileList) &&  fileList.length === 0
         ? "No file"
-        : uploadedFiles.map((item) => (
+        : fileList.map((item) => (
             <Item
+              
               key={item.id}
               item={item}
               onShowTranscription={handleShowTranscription}
             />
           ))}
       <Modal
-        open={selectedFile ? true : false}
+        open={onUploadClick}
         onClose={() => {
           setSelectedFile(null);
           setModalIndex(0);
+          setOnUploadClick(false)
         }}
         aria-labelledby="modal-title"
         aria-describedby="modal-description"

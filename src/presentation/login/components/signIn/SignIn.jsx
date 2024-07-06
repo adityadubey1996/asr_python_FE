@@ -4,9 +4,10 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faInfoCircle } from "@fortawesome/free-solid-svg-icons";
 import axios from "axios";
 import baseUrl from "../../../../utils/url";
-import { useNavigate } from "react-router";
+import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { userLoginSuccess } from "../../../../reducers/auth.reducer";
+import {getUserMetrics} from '../../../../reducers/metric.reducer'
 import Cookies from "universal-cookie";
 
 const SignUp = ({ setSignIn }) => {
@@ -41,7 +42,18 @@ const SignUp = ({ setSignIn }) => {
       if (res.data) {
         dispatch(userLoginSuccess(res.data));
         localStorage.setItem("user", JSON.stringify(res.data));
-        cookies.set("x-auth-token", res.data.data.access_token, { path: "/" });
+        cookies.set("auth-token", res.data.data.access_token, { path: "/" });
+        dispatch(getUserMetrics()).then((data) => {
+console.log('data from handleSignIn', data)
+if(data && data.payload && Array.isArray(data.payload) && data.payload.length > 0){
+  navigate('/main')
+}
+else{
+  navigate('/questions')
+}
+        }).catch((e) => {
+          console.log('error from handleSignIn', e)
+        })
         navigate("/");
       }
     } catch (error) {

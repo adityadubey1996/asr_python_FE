@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { userLogout } from "../../reducers/auth.reducer";
-import { useNavigate } from "react-router";
+import { useNavigate } from "react-router-dom";
 import Header from "./components/Header";
 import Sidebar from "./components/Sidebar";
 import ActivityTable from "./components/ActivityTable";
@@ -46,13 +46,14 @@ const Home = () => {
   const [selectedItem, setSelectedItem] = useState(
     constants.SIDEBAR_TRANSCRIPTIONS
   );
-
-  const navigate = useNavigate();
-  const user = useSelector((state) => state.user.user);
-
+console.log('useNavigate()', useNavigate())
+  // const navigate = useNavigate();
+  const user = useSelector((state) => state?.user);
+  const testing = useSelector((state) => state.user)
+  console.log('testing', testing)
   useEffect(() => {
     if (!user) {
-      navigate("/login");
+      // navigate("/login");
     }
 
   }, []);

@@ -10,9 +10,9 @@ import {
   faRightFromBracket,
   faXmark,
 } from "@fortawesome/free-solid-svg-icons";
-import axios from "axios";
+import axios from "../../../../utils/axios-interceptor";
 import baseUrl from "../../../../utils/url";
-import { useNavigate } from "react-router";
+import { useNavigate } from "react-router-dom";
 
 const SignUp = ({ setSignIn }) => {
   const [formData, setFormData] = useState({
@@ -48,7 +48,7 @@ const SignUp = ({ setSignIn }) => {
 
   const handleSignUp = async () => {
     try {
-      const res = await axios.post(baseUrl() + "/api/signUp", formData);
+      const res = await axios.post("/api/signUp", formData);
       if (res.data) {
         setSignIn(true);
       }

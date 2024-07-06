@@ -1,13 +1,15 @@
-import { createSlice } from "@reduxjs/toolkit";
+import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 
-let user = JSON.parse(localStorage.getItem("user"))
-  ? JSON.parse(localStorage.getItem("user"))
-  : "undefined";
+
+
+
+
+ 
 
 export const authSlice = createSlice({
   name: "user",
   initialState: {
-    user: user,
+    userData: undefined,
     isLoading: false,
     error: false,
   },
@@ -16,15 +18,16 @@ export const authSlice = createSlice({
       state.isLoading = true;
     },
     userLoginSuccess: (state, action) => {
+      console.log('action.payload',action.payload)
       state.isLoading = false;
-      state.user = action.payload;
+      state.userData = action.payload?.data;
     },
     userLoginFailure: (state, action) => {
       state.isLoading = false;
       state.error = true;
     },
-    userLogout: (state, action) => {
-      state.user = "";
+    userLogout: (state, action) => {  
+      state.userData = undefined;
     },
   },
 });
@@ -35,4 +38,7 @@ export const {
   userLoginSuccess,
   userLogout,
 } = authSlice.actions;
-export default authSlice.reducer;
+
+
+
+export default  authSlice.reducer;

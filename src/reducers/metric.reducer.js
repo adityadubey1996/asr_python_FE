@@ -1,25 +1,43 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import baseUrl from "../utils/url";
-import axios from "axios";
+import axios from "../utils/axios-interceptor";
 
-export const fetchQuestions = createAsyncThunk(
-  "metrics/fetchQuestions",
-  async () => {
-    const response = await fetch(`${baseUrl()}/api/metric/questions`);
-    if (response.ok) {
-      const data = await response.json();
-      return data;
+
+
+
+ 
+  export const fetchQuestions = createAsyncThunk(
+    "metrics/fetchQuestions",
+    async (_, { getState }) => {
+      const user = getState().user.user;  // Access the latest user state directly from the store
+      const token = user?.data?.access_token;
+  
+      if (!token) {
+        throw new Error("Token not available");
+      }
+  try{
+      const response = await axios.get(`/api/metric/questions`, {
+       
+      });
+  
+      if (response.status === 200) {
+        return response.data;
+      } else {
+        throw new Error("Failed to fetch questions");
+      }
+      
     }
-    throw new Error("Failed to fetch questions");
-  }
-);
+    catch(e){
+      return null;
+    }}
+  );
 
 export const saveAnswers = createAsyncThunk(
   "metrics/saveAnswers",
   async ({ answers }, { rejectWithValue }) => {
     try {
       const response = await axios.post(
-        `${baseUrl()}/api/metrics/user-metrics`,
+        `/api/metrics/user-metrics`, 
         answers
       );
       if (response.status == 200) {
@@ -33,15 +51,26 @@ export const saveAnswers = createAsyncThunk(
 
 export const getUserMetrics = createAsyncThunk(
   "metrics/getMetrics",
-  async () => {
-    const response = await axios.get(`${baseUrl()}/api/metrics/userMetrics`);
+  async (_, { getState }) => {
+    console.log('getState() from getUserMetrics',getState() )
+    const user = getState().user;  // Access the latest user state directly from the store
+    const token = user?.userData?.access_token;
+
+    if (!token) {
+      throw new Error("Token not available");
+    }
+    console.log('inside getUserMetrics')
     try {
+    const response = await axios.get(`/api/metrics/userMetrics`);
+   
       if (response.status === 200) {
         return response.data;
+      } else {
+        throw new Error("Failed to fetch questions");
       }
-      throw new Error("Failed to get metrics");
     } catch (error) {
-      console.log("something went wrong");
+      throw new Error("something went wrong", error);
+    
     }
   }
 );
@@ -79,7 +108,11 @@ const metricsSlice = createSlice({
       })
       .addCase(getUserMetrics.pending, (state, action) => {
         state.loading = true;
-      });
+      })
+      .addCase(getUserMetrics.rejected, (state, action) => {
+        state.error = action.payload;
+        state.loading = false;
+      })
   },
 });
 

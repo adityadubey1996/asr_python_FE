@@ -4,6 +4,7 @@ import ActivityTable from "./ActivityTable";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faFileUpload } from "@fortawesome/free-solid-svg-icons";
 import RecentRecordings from "./RecentRecordings";
+import FileUpload from './FileUpload';
 import io from 'socket.io-client';
 
 // const socket = io('http://127.0.0.1:5005', { transports: ['websocket'] });
@@ -13,7 +14,6 @@ const socket = null
 const ActivityDashBoard = () => {
   const [file, setFile] = useState(null);
   const [uploadStatus, setUploadStatus] = useState('');
-
 
 
 
@@ -82,6 +82,7 @@ const ActivityDashBoard = () => {
 
   return (
     <div className="w-full">
+      <FileUpload/>
       <div className="flex flex-row ">
         <ActivityTable />
         <div className="flex flex-col mt-10 w-[20%] ml-4">

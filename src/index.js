@@ -3,7 +3,8 @@ import ReactDOM from "react-dom/client";
 import App from "./App";
 import Routing from "./routes/routes";
 import { Provider } from "react-redux";
-import { store } from "./store";
+import { PersistGate } from 'redux-persist/integration/react';
+import  store , {persistor} from "./store";
 import './input.css'
 import axios from "axios";
 axios.defaults.withCredentials=true
@@ -11,7 +12,9 @@ axios.defaults.withCredentials=true
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
   <Provider store={store}>
+     <PersistGate loading={null} persistor={persistor}>
     <Routing />
+    </PersistGate>
   </Provider>
 );
 

@@ -23,7 +23,10 @@ const Sidebar = ({ selectedItem, setSelectedItem, sidebarItems }) => {
     navigate("/", { replace: true });
   };
 
-  const user = useSelector((state) => state.user.user.data);
+  const user = useSelector((state) => state?.user?.useData);
+  const testing = useSelector((state) => state.user)
+
+  console.log('testing', testing)
 
   return (
     <div className="bg-gray-900">
@@ -34,7 +37,7 @@ const Sidebar = ({ selectedItem, setSelectedItem, sidebarItems }) => {
             Private Workspace
           </h1>
           <h1 className="font-medium text-xs px-5 text-gray-300">
-            {user.email}
+            {user?.email}
           </h1>
         </div>
         <div className="grid gap-2">
