@@ -10,7 +10,8 @@ import Login from "../presentation/login/Login";
 import Home from "../presentation/home/Home";
 import Questionnaire from "../presentation/questionnaire";
 import { useEffect } from "react";
-import { fetchQuestions, getUserMetrics } from "../reducers/metric.reducer";
+import { fetchQuestions, getUserMetrics } from "reducers/metric.reducer";
+import QuizComponent from '../presentation/questionnaire/quiz2'
 
 const Routing = () => {
   const testing = useSelector((state) => state)
@@ -35,7 +36,7 @@ console.log('user', user)
     dispatch(getUserMetrics());
     }
     else{
-      
+
     }
    
   }, [dispatch, user?.access_token])
@@ -69,7 +70,7 @@ console.log('metrics', metrics)
           }
         /> 
 
-        <Route path="/questions" element={<Questionnaire />} /> 
+        <Route path="/questions" element={<QuizComponent />} /> 
 
        <Route path="/login" element={<Login />} /> 
         <Route path="/main" element={<Home />} />

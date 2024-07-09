@@ -10,7 +10,7 @@ import {
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import React, { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { userLogout } from "reducers/auth.reducer";
+// import { userLogout } from "";
 import { useNavigate } from "react-router-dom";
 
 const Sidebar = ({ selectedItem, setSelectedItem, sidebarItems }) => {
@@ -18,7 +18,7 @@ const Sidebar = ({ selectedItem, setSelectedItem, sidebarItems }) => {
   const navigate = useNavigate();
   
   const handleLogout = () => {
-    dispatch(userLogout());
+    // dispatch(userLogout());
     localStorage.clear();
     navigate("/", { replace: true });
   };

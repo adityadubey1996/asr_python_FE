@@ -1,4 +1,4 @@
-const constants = {
+export const constants = {
     STATUS_PENDING:"pending",
     STATUS_CANCELLED:"cancelled",
     STATUS_APPROVE:"approve",
@@ -12,4 +12,3 @@ const constants = {
     SIDEBAR_WORKFLOW: 'Workflow'
 }
 
-export default constants

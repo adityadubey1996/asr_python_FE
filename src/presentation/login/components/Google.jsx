@@ -1,12 +1,11 @@
 import React, { useEffect } from "react";
 import GoogleLogin from "react-google-login";
 import { gapi } from "gapi-script";
-import axios from '../../../utils/axios-interceptor';
-// import axios from 'axios'
-import baseUrl from "../../../utils/url";
+import  {axiosInstance as axios, baseUrl} from 'utils'
+
 import { useDispatch } from "react-redux";
-import { userLoginFailure, userLoginSuccess } from "../../../reducers/auth.reducer";
-import { getUserMetrics,  } from "../../../reducers/metric.reducer";
+import { userLoginFailure, userLoginSuccess } from "reducers/auth.reducer";
+import { getUserMetrics,  } from "reducers/metric.reducer";
 
 
 import { useNavigate } from "react-router-dom";

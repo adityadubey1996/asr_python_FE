@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import ReactPlayer from "react-player";
 import { useDispatch, useSelector } from "react-redux";
-import { getUserMetrics } from "../../../../reducers/metric.reducer";
+import { getUserMetrics } from "reducers/metric.reducer";
 import {
   Card,
   CardContent,
@@ -12,7 +12,6 @@ import {
 import { grey } from "@mui/material/colors";
 
 export const FilePreview = ({ selectedFile }) => {
-  console.log('selectedFile from FilePreview',selectedFile )
   return (
     <>
       <div style={{ flex: 1, padding: "1rem" }}>

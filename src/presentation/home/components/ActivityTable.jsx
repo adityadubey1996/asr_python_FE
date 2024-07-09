@@ -1,5 +1,5 @@
 import React from "react";
-import constants from "../../../utils/constants";
+import {constants} from "utils";
 
 const ActivityTable = () => {
   const tableItems = [

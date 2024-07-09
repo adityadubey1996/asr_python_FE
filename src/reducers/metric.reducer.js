@@ -1,6 +1,6 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import baseUrl from "../utils/url";
-import axios from "../utils/axios-interceptor";
+import  {axiosInstance as axios, baseUrl} from 'utils'
+
 
 
 
@@ -34,11 +34,11 @@ import axios from "../utils/axios-interceptor";
 
 export const saveAnswers = createAsyncThunk(
   "metrics/saveAnswers",
-  async ({ answers }, { rejectWithValue }) => {
+  async ({ answers, title }, { rejectWithValue }) => {
     try {
       const response = await axios.post(
-        `/api/metrics/user-metrics`, 
-        answers
+        `/api/userMetrics`, 
+        {customSettings :  answers, workflowTitle :title }
       );
       if (response.status == 200) {
         return answers;

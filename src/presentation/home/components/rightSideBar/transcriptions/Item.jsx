@@ -15,9 +15,9 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import { FormatSize } from "@mui/icons-material";
 import { red ,grey } from "@mui/material/colors";
-import { getFileExtensionFromURL, getFileNameFromURL } from "../../../../utils/functions";
+import { getFileExtensionFromURL, getFileNameFromURL } from "../../../../../utils/functions";
 
-const Item = ({ item, onShowTranscription }) => {
+const Item = ({ item, onShowTranscription, onDeleteClick }) => {
   const [showFullFilename, setShowFullFilename] = useState(false);
 
   const truncateFilename = (filename, length) => {
@@ -32,14 +32,12 @@ const Item = ({ item, onShowTranscription }) => {
           {" "}
           <span className="mr-4 font-semibold text-gray-200">
           {showFullFilename ? getFileNameFromURL(item.fileUrl) : truncateFilename(getFileNameFromURL(item.fileUrl), 20)}
-            {/* {getFileNameFromURL(item.fileUrl)} */}
           </span>
           <button onClick={() => setShowFullFilename(!showFullFilename)} className="text-blue-500 hover:text-blue-700 text-sm">
             {showFullFilename ? 'Show Less' : 'Read More'}
           </button>
           <div>
             <span className="mr-4 text-gray-500">
-              {/* <FontAwesomeIcon icon={FormatSize} /> {getFileSize(item.fileUrl)} */}
             </span>
             <span className="mr-4 text-gray-500">
               <FontAwesomeIcon icon={faGlobe} />
@@ -68,8 +66,8 @@ const Item = ({ item, onShowTranscription }) => {
         
 
         <Tooltip title="Delete">
-          <IconButton size="small">
-            <DeleteIcon style={{ color: red[500] }} />
+          <IconButton size="small" onClick={onDeleteClick}>
+            <DeleteIcon style={{ color: red[500] }}  />
           </IconButton>
         </Tooltip>
       </div>

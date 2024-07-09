@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from "react";
-import Item from "../rightSideBar/transcriptions/Item";
+import Item from "./Item";
 import { useSelector } from "react-redux";
 import Typography from "@mui/material/Typography";
 import Container from "@mui/material/Container";
@@ -8,11 +8,9 @@ import { faEdit } from "@fortawesome/free-regular-svg-icons";
 import { Divider, Box, Button, Paper, Modal } from "@mui/material";
 import UploadIcon from "@mui/icons-material/Upload";
 import io from "socket.io-client";
-import {axiosInstance as axios,baseUrl } from 'utils'
-// import axios from "../../../../utils/axios-interceptor";
-// import baseUrl from "../../../../utils/url";
+import  {axiosInstance as axios, baseUrl} from 'utils'
 import ReactPlayer from "react-player";
-import { FilePreview, Metrics } from "../rightSideBar/transcriptions/ModalData";
+import { FilePreview, Metrics } from "./ModalData";
 
 const Transcriptions = () => {
   const [socket, setSocket] = useState(null);
@@ -166,7 +164,6 @@ const Transcriptions = () => {
       const CHUNK_SIZE = 512 * 1024;
       const reader = new FileReader();
       reader.onload = () => {
-        throw new Error('Test error during chunk upload');
         const chunk = reader.result;
         socket.emit("upload_chunk", {
           chunk,

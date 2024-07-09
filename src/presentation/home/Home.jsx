@@ -1,10 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { userLogout } from "../../reducers/auth.reducer";
 import { useNavigate } from "react-router-dom";
-import Header from "./components/Header";
-import Sidebar from "./components/Sidebar";
-import ActivityTable from "./components/ActivityTable";
+import Sidebar from "./components/sidebar/index";
+import RightSideBar from './components/rightSideBar/index'
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faFile,
@@ -13,14 +11,8 @@ import {
   faPerson,
   faTasks,
 } from "@fortawesome/free-solid-svg-icons";
-import constants from "../../utils/constants";
-import Settings from "../home/components/Settings";
-import ReferAndEarn from "../home/components/ReferAndEarn";
-import ActivityDashBoard from "../home/components/ActivityDashBoard";
-import Recordings from "./components/Recordings";
-import Transcriptions from "./components/transcriptions/Transcriptions";
-import Workflow from "./components/Workflow";
-import { io } from "socket.io-client";
+import { constants } from "utils";
+
 
 const Home = () => {
   const sidebarItems = [
@@ -46,14 +38,11 @@ const Home = () => {
   const [selectedItem, setSelectedItem] = useState(
     constants.SIDEBAR_TRANSCRIPTIONS
   );
-console.log('useNavigate()', useNavigate())
-  // const navigate = useNavigate();
+  const navigate = useNavigate();
   const user = useSelector((state) => state?.user);
-  const testing = useSelector((state) => state.user)
-  console.log('testing', testing)
   useEffect(() => {
     if (!user) {
-      // navigate("/login");
+      navigate("/login");
     }
 
   }, []);
@@ -65,21 +54,8 @@ console.log('useNavigate()', useNavigate())
         selectedItem={selectedItem}
         setSelectedItem={setSelectedItem}
       />
-      <div className="flex flex-col flex-1">
-        <span>
-          {" "}
-          <Header selectedItem={selectedItem} />
-        </span>
-        {selectedItem === constants.SIDEBAR_RECORDINGS && <Recordings />}
-        {selectedItem === constants.SIDEBAR_TRANSCRIPTIONS && (
-          <Transcriptions />
-        )}
-        {selectedItem === constants.SIDEBAR_DASHBOARD && <ActivityDashBoard />}
-        {selectedItem === constants.SIDEBAR_REFER_AND_EARN && <ReferAndEarn />}
-        {selectedItem === constants.SIDEBAR_SETTINGS && <Settings />}
-        {selectedItem === constants.SIDEBAR_WORKFLOW && <Workflow />}
-      </div>
-    </div>
+      <RightSideBar selectedItem={selectedItem}/>
+    </div> 
   );
 };
 

@@ -1,10 +1,9 @@
-import axios from "axios";
 import React, { useEffect, useState } from "react";
-import baseUrl from "../../utils/url";
-import { saveAnswers } from "../../reducers/metric.reducer";
+
+import { saveAnswers } from "reducers/metric.reducer";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import { setMetricsStatus } from "../../reducers/auth.reducer";
+import { setMetricsStatus } from "reducers/auth.reducer";
 
 const questions = [
   {
@@ -66,7 +65,6 @@ const QuizComponent = () => {
   const isLastQuestion = currentQuestionIndex === questions.length - 1;
   const testing = useSelector(state=> state.user)
   const user = useSelector(state=> state.user.user)
-console.log('testing from QuizComponent', testing)
   useEffect(()=>{
     if(user.metricsExist){
       navigate('/main')

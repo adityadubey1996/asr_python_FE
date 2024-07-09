@@ -1,10 +1,10 @@
 import React, {useState} from "react";
 import TextField from "@mui/material/TextField";
-import ActivityTable from "./ActivityTable";
+import ActivityTable from "../ActivityTable";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faFileUpload } from "@fortawesome/free-solid-svg-icons";
-import RecentRecordings from "./RecentRecordings";
-import FileUpload from './FileUpload';
+import RecentRecordings from "../RecentRecordings";
+import FileUpload from '../FileUpload';
 import io from 'socket.io-client';
 
 // const socket = io('http://127.0.0.1:5005', { transports: ['websocket'] });

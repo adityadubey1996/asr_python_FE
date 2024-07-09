@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { fetchQuestions, saveAnswers } from '../../reducers/metric.reducer';
+import { fetchQuestions, saveAnswers } from 'reducers/metric.reducer';
 import QuizComponent from './quiz'
 import {questionsSchema} from './questionnaire_schema'
 const Questionnaire = () => {
