@@ -1,3 +1,4 @@
+ import {questions} from './constants'
  export const getFileNameFromURL = (url) => {
     const fileNameWithPrefix = url.substring(url.lastIndexOf('/') + 1);
     const fileName = fileNameWithPrefix.substring(fileNameWithPrefix.indexOf('_') + 1); 
@@ -40,4 +41,36 @@
       audioType: "General",
     },
   ]);
+
+
+  export const fromDictsToList = (questions, answers, followUpAnswers) =>{
+    return questions.map(question => ({
+        question: question.text,
+        answerSelected: answers[question.id],
+        textInfoTyped: followUpAnswers[question.id] || null
+    }));
+
+
+
+}
+
+
+export const  fromListToDicts = (questionList) => {
+  const answers = {};
+  const followUpAnswers = {};
+
+  questionList.forEach(item => {
+      const questionId = questions.find((e) => e.text === item.question)?.id  
+ 
+      answers[questionId] = item.answerSelected;
+
+      if (item.textInfoTyped && Object.keys(item.textInfoTyped).length > 0) {
+          followUpAnswers[questionId] = item.textInfoTyped;
+      }
+  });
+
+
+  return { answers, followUpAnswers };
+}
+
   

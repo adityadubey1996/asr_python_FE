@@ -8,30 +8,23 @@ import {
 import { useSelector, useDispatch } from "react-redux";
 import Login from "../presentation/login/Login";
 import Home from "../presentation/home/Home";
-import Questionnaire from "../presentation/questionnaire";
 import { useEffect } from "react";
 import { fetchQuestions, getUserMetrics } from "reducers/metric.reducer";
 import QuizComponent from '../presentation/questionnaire/quiz2'
+import NotFoundComponent  from '../presentation/routeNotFoundPage';
+import ErrorBoundary from '../ErrorBoundary'
 
 const Routing = () => {
-  const testing = useSelector((state) => state)
-  console.log('testing from routes', testing)
   const user = useSelector((state) => state?.user?.userData);
   const metrics = useSelector((state) => state.metrics)
-  console.log(metrics)
   const dispatch = useDispatch()
-  console.log('user from reducer', user)
-  const userAnswers = useSelector((state) => state.metrics);
+ 
 
   const isUserLoggedIn = () => {
-    
-    return !!user?.data;
+    return !!user?.access_token;
   };
-  console.log('isUserLoggedIn', isUserLoggedIn())
 
   useEffect(() => {
-console.log('user', user)
-    console.log('first Time Mounting')
     if(user?.access_token){
     dispatch(getUserMetrics());
     }
@@ -46,36 +39,22 @@ console.log('metrics', metrics)
 
   }, [metrics])
 
-//TODO: check is the user token is valid and question metric exist for the user.
-
-  const isQuestionnaireComplete = () => {
-    return user.metricsExist;
-  };
-
   return (
+    <ErrorBoundary>
     <Router>
       <Routes>
-        <Route
-          path="/"
-          element={
-            isUserLoggedIn() ? (
-              !isQuestionnaireComplete() ? (
-                <Navigate to="/questions" replace />
-              ) : (
-                <Navigate to="/main" replace />
-              )
-            ) : (
-              <Navigate to="/login" replace />
-            )
-          }
-        /> 
-
-        <Route path="/questions" element={<QuizComponent />} /> 
-
-       <Route path="/login" element={<Login />} /> 
-        <Route path="/main" element={<Home />} />
+          <Route path="/" element={<Navigate to={isUserLoggedIn() ? "/main" : "/login"} replace />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/main" element={isUserLoggedIn() ? <Home /> : <Navigate to="/login" replace />} />
+        <Route path="/questions" element={isUserLoggedIn() ? <QuizComponent /> : <Navigate to="/login" replace />} />
+        <Route path="/recordings" element={isUserLoggedIn() ? <Home defaultItem="recordings" /> : <Navigate to="/login" replace />} />
+        <Route path="/transcriptions" element={isUserLoggedIn() ? <Home defaultItem="transcriptions" /> : <Navigate to="/login" replace />} />
+        <Route path="/workflow" element={isUserLoggedIn() ? <Home defaultItem="workflow" /> : <Navigate to="/login" replace />} />
+        <Route path="/settings" element={isUserLoggedIn() ? <Home defaultItem="settings" /> : <Navigate to="/login" replace />} />
+        <Route path="*" element={<NotFoundComponent />} />
       </Routes>
     </Router>
+    </ErrorBoundary>
   );
 };
 

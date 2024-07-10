@@ -14,27 +14,8 @@ import {
 import { constants } from "utils";
 
 
-const Home = () => {
-  const sidebarItems = [
-    {
-      title: constants.SIDEBAR_RECORDINGS,
-      icon: <FontAwesomeIcon icon={faFile} />,
-    },
-    {
-      title: constants.SIDEBAR_TRANSCRIPTIONS,
-      icon: <FontAwesomeIcon icon={faMoneyBill} />,
-    },
-    // { title: "Dashboard", icon: <FontAwesomeIcon icon={faHome} /> },
-    {
-      title: constants.SIDEBAR_WORKFLOW,
-      icon: <FontAwesomeIcon icon={faTasks} />,
-    },
-    // { title: "Refer & Earn", icon: <FontAwesomeIcon icon={faTasks} /> },
-    {
-      title: constants.SIDEBAR_SETTINGS,
-      icon: <FontAwesomeIcon icon={faPerson} />,
-    },
-  ];
+const Home = ({defaultItem}) => {
+
   const [selectedItem, setSelectedItem] = useState(
     constants.SIDEBAR_TRANSCRIPTIONS
   );
@@ -46,11 +27,9 @@ const Home = () => {
     }
 
   }, []);
-
   return (
     <div className="flex flex-row bg-gray-900">
       <Sidebar
-        sidebarItems={sidebarItems}
         selectedItem={selectedItem}
         setSelectedItem={setSelectedItem}
       />

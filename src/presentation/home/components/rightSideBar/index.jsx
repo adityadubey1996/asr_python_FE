@@ -18,8 +18,8 @@ const RightSideBar = ({selectedItem}) => {
       {selectedItem === constants.SIDEBAR_TRANSCRIPTIONS && (
         <Transcriptions />
       )}
-      {selectedItem === constants.SIDEBAR_DASHBOARD && <ActivityDashBoard />}
-      {selectedItem === constants.SIDEBAR_REFER_AND_EARN && <ReferAndEarn />}
+      {/* {selectedItem === constants.SIDEBAR_DASHBOARD && <ActivityDashBoard />} */}
+      {/* {selectedItem === constants.SIDEBAR_REFER_AND_EARN && <ReferAndEarn />} */}
       {selectedItem === constants.SIDEBAR_SETTINGS && <Settings />}
       {selectedItem === constants.SIDEBAR_WORKFLOW && <Workflow />}
       </div>

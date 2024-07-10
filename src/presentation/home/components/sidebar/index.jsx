@@ -10,10 +10,11 @@ import {
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import React, { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import { sidebarItems } from "utils";
 // import { userLogout } from "";
 import { useNavigate } from "react-router-dom";
 
-const Sidebar = ({ selectedItem, setSelectedItem, sidebarItems }) => {
+const Sidebar = ({ selectedItem, setSelectedItem }) => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   
@@ -24,6 +25,11 @@ const Sidebar = ({ selectedItem, setSelectedItem, sidebarItems }) => {
   };
 
   const user = useSelector((state) => state?.user?.useData);
+
+  const handleItemClick = (item) => {
+    setSelectedItem(item.title);
+    navigate(`/${item.title.toLowerCase()}`);  // This assumes your route names match the sidebar titles
+  };
 
   return (
     <div className="bg-gray-900">
@@ -38,10 +44,10 @@ const Sidebar = ({ selectedItem, setSelectedItem, sidebarItems }) => {
           </h1>
         </div>
         <div className="grid gap-2">
-          {sidebarItems.map((x, index) => (
+          {/* {sidebarItems.map((x, index) => (
             <div
               key={index}
-              onClick={() => setSelectedItem(x.title)}
+              onClick={() => handleItemClick(x)}
               className="flex hover:bg-gray-800 py-3 px-4 cursor-pointer items-center"
             >
               <span
@@ -64,7 +70,13 @@ const Sidebar = ({ selectedItem, setSelectedItem, sidebarItems }) => {
                 {x.title}
               </div>
             </div>
-          ))}
+          ))} */}
+             {sidebarItems.map((item, index) => (
+        <div key={index} onClick={() => handleItemClick(item)} className={`hover:bg-gray-800 p-3 cursor-pointer flex items-center ${selectedItem === item.title ? "text-white font-bold" : "text-gray-300"}`}>
+          <FontAwesomeIcon icon={item.icon} className="mr-2" />
+          <span>{item.title}</span>
+        </div>
+      ))}
         </div>
         <h1
           onClick={() => handleLogout()}

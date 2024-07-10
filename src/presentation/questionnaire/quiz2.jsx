@@ -1,69 +1,10 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import { saveAnswers } from "reducers/metric.reducer";
+import { createMetric } from "reducers/metric.reducer";
 import styles from './styles.css'
+import {questions, fromDictsToList} from 'utils'
 
-const questions = [
-    {
-      id: 1,
-      text: "What is the primary purpose of this recording?",
-      options: ["Training/Educational", "Meeting/Conversation", "Presentation", "Compliance Review", "Other"],
-      type: "single-choice",
-      optionsRequiringFollowUp: ["Other"], // Specify options that need follow-up
-      followUpQuestion: "Please specify:",
-      followUpType: "text"
-    },
-    {
-      id: 2,
-      text: "Is this recording related to a specific industry or domain?",
-      type: "boolean",
-      options: ["Yes", "No"],
-      followUp: true,
-      optionsRequiringFollowUp: ["Yes"],
-      followUpCondition: ["Yes"], // Condition updated for clarity
-      followUpQuestion: "If yes, please specify the industry:",
-      followUpType: "text"
-    },
-    {
-      id: 3,
-      text: "Approximately how many speakers are involved in this recording?",
-      type: "text",
-      placeholder: "Enter a number"
-    },
-    {
-      id: 4,
-      text: "Would you like us to analyze the content for any specific compliance requirements?",
-      type: "boolean",
-      options: ["Yes", "No"],
-      followUp: true,
-      followUpCondition: ["Yes"],
-      optionsRequiringFollowUp: ["Yes"],
-      followUpQuestion: "If yes, please specify the compliance requirements:",
-      followUpType: "text"
-    },
-    {
-        id: 5,
-        text: "Select the types of analysis you would like us to perform on the recording:",
-        options: [
-          "Speaker talk time ratios — Analyze the proportion of talk time per participant.",
-          "Key topics discussed — Identify main topics covered in the conversation.",
-          "Sentiment analysis — Assess the sentiment (positive, neutral, negative) of each speaker.",
-          "Compliance issue tracking — Highlight potential compliance risks or violations mentioned.",
-          "Custom analysis — Specify any additional or particular insights you need."
-        ],
-        type: "multi-choice",
-        optionsRequiringFollowUp: ["Custom analysis — Specify any additional or particular insights you need.", "Speaker talk time ratios — Analyze the proportion of talk time per participant.", "Key topics discussed — Identify main topics covered in the conversation.", "Sentiment analysis — Assess the sentiment (positive, neutral, negative) of each speaker.", "Compliance issue tracking — Highlight potential compliance risks or violations mentioned."],
-        followUpQuestion: "Please describe the custom analysis you need:",
-        followUpType: "text"
-      },
-      {
-        id: 6,
-        text: "Let's give the template a name before creating it",
-        type: "text",
-        placeholder: "Enter a Name"
-      },
-  ];
   
   
 
@@ -91,13 +32,17 @@ const QuizComponent = () => {
     };
     setAnswers(newAnswers);
 
+ 
+  const newFollowUpAnswers = {...followUpAnswers};
 
-    // Automatically clear follow-up answers if the condition is no longer met
-    if (!currentQuestion.followUp || (currentQuestion.followUp && option !== "Yes" && option !== currentQuestion.followUpCondition)) {
-      const newFollowUpAnswers = { ...followUpAnswers };
-      delete newFollowUpAnswers[currentQuestion.id];
-      setFollowUpAnswers(newFollowUpAnswers);
-    }
+  if (currentQuestion.optionsRequiringFollowUp.includes(option)) {
+    // Ensure the structure exists to hold follow-up answers
+    newFollowUpAnswers[currentQuestion.id] = newFollowUpAnswers[currentQuestion.id] || {};
+  } else {
+    // If new option does not require follow-up, clear previous entries
+    delete newFollowUpAnswers[currentQuestion.id];
+  }
+  setFollowUpAnswers(newFollowUpAnswers);
   };
 
   const handleFollowUpAnswer = (id, text) => {
@@ -142,6 +87,7 @@ const handleMultiChoiceChange = (id, isChecked, option) => {
       setFollowUpAnswers(newFollowUpAnswers);
     }
   };
+
   const handleDetailedInputChange = (questionId, option, value) => {
     setFollowUpAnswers({
         ...followUpAnswers,
@@ -151,7 +97,17 @@ const handleMultiChoiceChange = (id, isChecked, option) => {
         }
     });
 };
+useEffect(() =>{
+console.log('answers useEffect', answers)
+},[answers])
 
+useEffect(() =>{
+  console.log('answers useEffect', answers)
+  },[answers])
+
+  useEffect(() =>{
+    console.log('followUpAnswers useEffect', followUpAnswers)
+    },[followUpAnswers])
 
 const renderOptions = () => {
   
@@ -165,9 +121,8 @@ const renderOptions = () => {
               type="radio"
               name={`question_${currentQuestion.id}`}
               value={option}
-              checked={answers[currentQuestion.id] === option}
-              onChange={(e) => {
-                handleOptionChange(currentQuestion.id, e.target.value)}}
+              checked={answers[currentQuestion.id]?.includes(option)}
+              onChange={(e) => handleOptionChange(currentQuestion.id, e.target.value)}
               className="mr-2"
             />
             {option}
@@ -176,8 +131,8 @@ const renderOptions = () => {
               <input
                 type="text"
                 placeholder={currentQuestion.followUpQuestion}
-                value={followUpAnswers[currentQuestion.id] || ""}
-                onChange={(e) => handleFollowUpAnswer(currentQuestion.id, e.target.value)}
+                value={followUpAnswers[currentQuestion.id]?.[option] || ""}
+                onChange={(e) => handleDetailedInputChange(currentQuestion.id,option,  e.target.value)}
                 className="mt-2 block w-full p-2 bg-gray-700 text-white rounded"
               />
             )}
@@ -227,12 +182,12 @@ const renderOptions = () => {
               className="mr-2"
             />
             {option}
-            {currentQuestion.followUp && option === "Yes" && answers[currentQuestion.id] === "Yes" && (
+            {currentQuestion.optionsRequiringFollowUp.includes(option) && answers[currentQuestion.id] === option &&(
               <input
                 type="text"
                 placeholder={currentQuestion.followUpQuestion}
-                value={followUpAnswers[currentQuestion.id] || ""}
-                onChange={(e) => handleFollowUpAnswer(currentQuestion.id, e.target.value)}
+                value={followUpAnswers[currentQuestion.id]?.[option] || ""}
+                onChange={(e) => handleDetailedInputChange(currentQuestion.id, option, e.target.value)}
                 className="mt-2 block w-full p-2 bg-gray-700 text-white rounded"
               />
             )}
@@ -282,14 +237,10 @@ const renderOptions = () => {
     }else{
 
         if(validateAndProceed()){
-      let updatedQuestions = questions.map(question => ({
-        question: question.text,
-        answerSelected: answers[question.id] || null,
-        textInfoTyped: followUpAnswers[question.id] || null,
-      }));
+          let    updatedQuestions =  fromDictsToList(questions, answers, followUpAnswers)
       try {
-        const resultAction = await dispatch(saveAnswers({ answers: updatedQuestions, title : workflowTitle }));
-        if (saveAnswers.fulfilled.match(resultAction)) {
+        const resultAction = await dispatch(createMetric({ answers: updatedQuestions, title : workflowTitle }));
+        if (createMetric.fulfilled.match(resultAction)) {
           navigate('/main');
         } else {
           console.error("Failed to save answers:", resultAction.error);

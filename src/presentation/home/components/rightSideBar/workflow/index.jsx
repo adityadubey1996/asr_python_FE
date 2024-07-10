@@ -6,9 +6,10 @@ import Container from "@mui/material/Container";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEdit } from "@fortawesome/free-regular-svg-icons";
 
-import { Divider, Box, Button, Paper, Modal } from "@mui/material";
+import { Divider, Box, Button, Paper, Modal,CircularProgress  } from "@mui/material";
 import { grey } from "@mui/material/colors";
 import HardCodedItem from './hardCodedItem'
+import {fromListToDicts} from 'utils'
 
 const Workflow = () => {
   const dispatch = useDispatch();
@@ -17,14 +18,20 @@ const Workflow = () => {
 
   const metrics = useSelector(state=> state.metrics.userMetrics)
 
+
   useEffect(() => {
     async function fetchData() {
       try {
+        setLoading(true)
         const result = await dispatch(getUserMetrics());
-        
-        if (result.payload && result.payload.length > 0) {
-          const userMetric = result.payload[0];
-          setUserMetrics(JSON.parse(userMetric.customSettings));
+        console.log('result from Workflow', result)
+        if (result.payload &&Array.isArray(result.payload) &&  result.payload.length > 0) {
+
+          const userMetric = result.payload.map((e) => {try{return {...e, customSettings : JSON.parse(e.customSettings)}} catch(e) {
+            return null
+          }}).filter((e) => e );
+          console.log('userMetric', userMetric)
+          setUserMetrics(userMetric);
         } else {
           console.error("Error fetching user metrics: No data found");
         }
@@ -34,14 +41,14 @@ const Workflow = () => {
         setLoading(false);
       }
     }
-    if(metrics){
-      console.log(metrics[0])
-      setUserMetrics(JSON.parse(metrics[0].customSettings))
-      setLoading(false)
-    } else {
+   
       fetchData();
-    }
-  }, [dispatch]);
+  
+  }, [dispatch]);  
+  
+  useEffect(() => {
+console.log('userMetrics fromuseEffect', userMetrics)
+  },[userMetrics])
 
   return (
     <Container maxWidth="lg" className="p-4">
@@ -56,8 +63,23 @@ const Workflow = () => {
        </Typography>
        
      </Box>
+
     
-<HardCodedItem/>
+{loading ? (
+        <Box
+        display="flex"
+        justifyContent="center"
+        alignItems="center"
+        height="calc(100vh - 100px)" // Adjust height as needed
+      >
+        <CircularProgress color="inherit" />
+      </Box>
+      ) : 
+        userMetrics.length > 0 && userMetrics.map((metric) => {
+          return   <HardCodedItem  metric = {metric}/>
+        })
+      
+      }
 
 
 
