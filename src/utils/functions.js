@@ -58,7 +58,7 @@
 export const  fromListToDicts = (questionList) => {
   const answers = {};
   const followUpAnswers = {};
-
+try{
   questionList.forEach(item => {
       const questionId = questions.find((e) => e.text === item.question)?.id  
  
@@ -68,9 +68,14 @@ export const  fromListToDicts = (questionList) => {
           followUpAnswers[questionId] = item.textInfoTyped;
       }
   });
-
-
   return { answers, followUpAnswers };
+
+}
+catch(e){
+  console.error('Error from utils fromListToDicts', e)
+  return {};
+}
+
 }
 
   

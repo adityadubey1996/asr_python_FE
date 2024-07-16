@@ -2,7 +2,7 @@ import Settings from "./Settings";
 import ReferAndEarn from "./ReferAndEarn";
 import ActivityDashBoard from "./ActivityDashBoard";
 import Recordings from "./Recordings";
-import Transcriptions from "./transcriptions/index";
+import Transcriptions from "./transcriptions/index1";
 import Workflow from "./workflow/index";
 import Header from './Header'
 import { constants } from "utils";

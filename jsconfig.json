@@ -1,10 +1,11 @@
 {
-    "compilerOptions": {
-      "baseUrl": "src",
-      "paths": {
-        "@utils/*": ["utils/*"],
-        "@reducers/*": ["reducers/*"],
-      }
-    },
-    "include": ["src"]
-  }
+  "compilerOptions": {
+    "baseUrl": "src",
+    "paths": {
+      "@components/*": ["components/*"],
+      "@utils/*": ["utils/*"]
+    }
+  },
+  "exclude": ["node_modules", "build"],
+  "include": ["src"]
+}

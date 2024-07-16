@@ -1,5 +1,5 @@
 // Item.js
-import React, {useState} from "react";
+import React, {useEffect, useState} from "react";
 import Checkbox from "@mui/material/Checkbox";
 import IconButton from "@mui/material/IconButton";
 import EditIcon from "@mui/icons-material/Edit";
@@ -17,15 +17,18 @@ import { FormatSize } from "@mui/icons-material";
 import { red ,grey } from "@mui/material/colors";
 import { getFileExtensionFromURL, getFileNameFromURL } from "../../../../../utils/functions";
 
-const Item = ({ item, onShowTranscription, onDeleteClick }) => {
+const Item = ({ item, onShowTranscription, onDeleteClick, progress }) => {
   const [showFullFilename, setShowFullFilename] = useState(false);
 
   const truncateFilename = (filename, length) => {
     return filename.length > length ? `${filename.substring(0, length)}...` : filename;
   };
 
+
   return (
-    <div className="flex items-center p-4 mb-4 border border-gray-800 rounded-lg bg-gray-800">
+    <div className="relative flex items-center p-4 mb-4 border border-gray-800 rounded-lg bg-gray-800">
+     <div className="absolute top-0 left-0 h-full bg-gray-700 opacity-50 rounded-lg"></div>
+     <div style={{ width:(progress &&  progress.fileId === item.id) ?  `${progress.progressPercentage}%` : `0%` }} className="absolute top-0 left-0 h-full bg-blue-500 rounded-lg transition-width duration-200 ease-in-out"></div>
       <Checkbox className="mr-4" style={{color : grey[100]}}/>
       <div className="flex flex-1">
         <div>
@@ -71,7 +74,8 @@ const Item = ({ item, onShowTranscription, onDeleteClick }) => {
           </IconButton>
         </Tooltip>
       </div>
-    </div>
+      </div>
+     
   );
 };
 

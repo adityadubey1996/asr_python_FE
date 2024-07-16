@@ -15,7 +15,7 @@ import {questions, fromListToDicts,fromDictsToList } from 'utils'
 import {updateUserMetric,deleteUserMetric } from './utils'
 import  './styles.css'
 
-const HardCodedItem = ({metric, deleteMetricFromList, updateMetricInList}) => {
+const WorkFlowTile = ({metric, deleteMetricFromList, updateMetricInList, shouldShowSelection,setSelectedMetric, selectedMetric}) => {
   const [isExpanded, setIsExpanded] = useState(false);
   const [answers, setAnswers] = useState({});
   const [followUpAnswers, setFollowUpAnswers] = useState({});
@@ -26,17 +26,24 @@ const HardCodedItem = ({metric, deleteMetricFromList, updateMetricInList}) => {
 useEffect(() => {
   setWorkflowTitle(metric?.workflowTitle)
 const {answers , followUpAnswers} = fromListToDicts(metric?.customSettings)
+if(answers && followUpAnswers){
 setAnswers(answers)
 setFollowUpAnswers(followUpAnswers)
+}
 
 },[metric])
+
+useEffect(() => {
+console.log('selectedMetric from titile', selectedMetric)
+
+},[selectedMetric])
 
 const handleUpdateMetric = async (metricId, updatedData) => {
   setLoading(true);
   try {
     const updatedMetric = await updateUserMetric(metricId, updatedData);
-    console.log('updatedMetric',updatedMetric)
     updateMetricInList(updatedMetric)
+    setEditMode(false)
   } catch (err) {
     alert('Failed to update metric');
     console.error(err);
@@ -46,10 +53,12 @@ const handleUpdateMetric = async (metricId, updatedData) => {
 };
 
 const handleDeleteMetric = async (metricId) => {
+
   setLoading(true);
   try {
     await deleteUserMetric(metricId);
     deleteMetricFromList(metricId)
+    setEditMode(false)
   } catch (err) {
     alert('Failed to delete metric');
     console.error(err);
@@ -60,7 +69,7 @@ const handleDeleteMetric = async (metricId) => {
 
 
   const onDeleteClick = () => {
-    handleDeleteMetric(metric.id)
+    handleDeleteMetric(metric.userMetricId)
     // Add deletion logic here
   };
 
@@ -69,8 +78,9 @@ const handleDeleteMetric = async (metricId) => {
   }
 
   const onSaveClick = () => {
+
     let    updatedQuestions =  fromDictsToList(questions, answers, followUpAnswers)
-    handleUpdateMetric(metric.id,updatedQuestions )
+    handleUpdateMetric(metric.userMetricId,{customSettings : updatedQuestions, workflowTitle : workflowTitle} )
   }
 
 
@@ -163,6 +173,7 @@ const handleMultiChoiceChange = (id, isChecked, option) => {
               type="radio"
               name={`question_${currentQuestion.id}`}
               value={option}
+              disabled={!isEditMode}
               checked={answers[currentQuestion.id]?.includes(option)}
               onChange={(e) => handleOptionChange(currentQuestion.id, e.target.value)}
               className="mr-2"
@@ -172,6 +183,8 @@ const handleMultiChoiceChange = (id, isChecked, option) => {
             {currentQuestion.optionsRequiringFollowUp.includes(option) && answers[currentQuestion.id] === option && (
               <input
                 type="text"
+                disabled={!isEditMode}
+
                 placeholder={currentQuestion.followUpQuestion}
                 value={followUpAnswers[currentQuestion.id]?.[option] || ""}
                 onChange={(e) => handleDetailedInputChange(currentQuestion.id,option,  e.target.value)}
@@ -188,6 +201,8 @@ const handleMultiChoiceChange = (id, isChecked, option) => {
               <div key={index} className="mb-4">
                 <label className="block">
                   <input
+                                disabled={!isEditMode}
+
                     type="checkbox"
                     name={`question_${currentQuestion.id}`}
                     value={option}
@@ -200,6 +215,8 @@ const handleMultiChoiceChange = (id, isChecked, option) => {
                
                 {answers[currentQuestion.id]?.includes(option) && currentQuestion.optionsRequiringFollowUp.includes(option) && (
                   <textarea
+                                disabled={!isEditMode}
+
                     placeholder={currentQuestion.followUpQuestion}
                     value={followUpAnswers[currentQuestion.id]?.[option] || ""}
                     onChange={(e) => handleDetailedInputChange(currentQuestion.id, option, e.target.value)}
@@ -216,6 +233,8 @@ const handleMultiChoiceChange = (id, isChecked, option) => {
         return currentQuestion.options.map((option, index) => (
           <label key={index} className="block">
             <input
+                          disabled={!isEditMode}
+
               type="radio"
               name={`question_${currentQuestion.id}`}
               value={option}
@@ -226,6 +245,8 @@ const handleMultiChoiceChange = (id, isChecked, option) => {
             {option}
             {currentQuestion.optionsRequiringFollowUp.includes(option) && answers[currentQuestion.id] === option &&(
               <input
+                            disabled={!isEditMode}
+
                 type="text"
                 placeholder={currentQuestion.followUpQuestion}
                 value={followUpAnswers[currentQuestion.id]?.[option] || ""}
@@ -239,6 +260,8 @@ const handleMultiChoiceChange = (id, isChecked, option) => {
       case "text":
         return (
           <input
+                        disabled={!isEditMode}
+
             type="text"
             placeholder={currentQuestion.placeholder}
             value={answers[currentQuestion.id] || ""}
@@ -253,13 +276,29 @@ const handleMultiChoiceChange = (id, isChecked, option) => {
 
   };
 
-function getClassName(isExpanded) {
-  let baseClass = "flex flex-col text-white p-4 mb-4 border border-gray-800 rounded-lg bg-gray-800";
-  return `${baseClass} ${isExpanded ? '' : 'hover:scale-105 transition-transform duration-200 ease-in-out'}`;
-}
+  function getClassName(isExpanded, metric, selectedMetric) {
+    let baseClass = "flex flex-col text-white p-4 mb-4 border border-gray-800 rounded-lg";
+  
+    // Check if the item is expanded
+    if (isExpanded) {
+      // Use gray background when expanded
+      return `${baseClass} bg-gray-600`;
+    } else if (metric.userMetricId === selectedMetric) {
+      // Use green background and hover effect if selected and not expanded
+      return `${baseClass} bg-green-500 hover:scale-105 transition-transform duration-200 ease-in-out`;
+    } else {
+      // Use gray background and hover effect if not selected and not expanded
+      return `${baseClass} bg-gray-600 hover:scale-105 transition-transform duration-200 ease-in-out`;
+    }
+  }
+
   return (
-    <div className = {getClassName(isExpanded)} >
-     {loading ? <div className="centerLoader"><CircularProgress/></div> : (
+    <div className = {getClassName(isExpanded, metric, selectedMetric)} onClick={() => {
+      if(shouldShowSelection && !isExpanded){
+        setSelectedMetric(metric.userMetricId)
+      }
+    }}>
+     {loading ? <div className="flex justify-center items-center w-full h-screen"><CircularProgress/></div> : (
 
 <>
     
@@ -285,7 +324,10 @@ function getClassName(isExpanded) {
             </IconButton>
           </Tooltip>}
           <Tooltip title="Expand/Collapse">
-            <IconButton onClick={() => setIsExpanded(!isExpanded)}>
+            <IconButton onClick={() => {
+              setIsExpanded(!isExpanded)
+            setSelectedMetric(null);
+            }}>
               <ExpandMore style={{ color: grey[300] }} />
             </IconButton>
           </Tooltip>
@@ -294,7 +336,9 @@ function getClassName(isExpanded) {
       </div>
       
       {isExpanded && !loading && questions.map((currentQuestion) => {
-        return (
+        if(currentQuestion?.doNotShowOnEditMode) return <></>;
+        
+        return  (
  <div className="p-4">
  <h1 className="text-l font-bold mb-4">{currentQuestion.text}</h1>
 <div className="space-y-4">
@@ -323,4 +367,4 @@ function getClassName(isExpanded) {
   );
 };
 
-export default HardCodedItem;
+export default WorkFlowTile;

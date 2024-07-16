@@ -98,7 +98,8 @@ export const questions = [
         id: 6,
         text: "Let's give the template a name before creating it",
         type: "text",
-        placeholder: "Enter a Name"
+        placeholder: "Enter a Name",
+        doNotShowOnEditMode: true,
       },
   ];
 
