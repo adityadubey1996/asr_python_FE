@@ -30,7 +30,9 @@ if(answers && followUpAnswers){
 setAnswers(answers)
 setFollowUpAnswers(followUpAnswers)
 }
-
+if(shouldShowSelection && !setSelectedMetric){
+console.error('setSelectedMetric is required when shouldShowSelection is true')
+}
 },[metric])
 
 useEffect(() => {
@@ -320,13 +322,16 @@ const handleMultiChoiceChange = (id, isChecked, option) => {
           </Tooltip>}
           {isExpanded && <Tooltip title="Edit">
             <IconButton size="small" onClick={onEditClick}>
-              <EditIcon  style={{ color: grey[300] }}/>
+              {/* <EditIcon  style={{ color: grey[300] }}/> */}
             </IconButton>
           </Tooltip>}
           <Tooltip title="Expand/Collapse">
             <IconButton onClick={() => {
               setIsExpanded(!isExpanded)
-            setSelectedMetric(null);
+              if(shouldShowSelection){
+                setSelectedMetric(null);
+
+              }
             }}>
               <ExpandMore style={{ color: grey[300] }} />
             </IconButton>

@@ -7,17 +7,12 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEdit } from "@fortawesome/free-regular-svg-icons";
 import { Divider, Box, Button, Paper, Modal } from "@mui/material";
 import UploadIcon from "@mui/icons-material/Upload";
-import io from "socket.io-client";
 import {axiosInstance as axios,baseUrl, uploadFileToGCS, } from 'utils'
-// import axios from "../../../../utils/axios-interceptor";
-// import baseUrl from "../../../../utils/url";
-import ReactPlayer from "react-player";
-import { FilePreview, Metrics } from "./ModalData";
 import UploadModal from './UploadModal'
-
+import VerificationModal from "components/confirmModal";
+import DeleteConfirmationModal from 'components/deleteConfirmModal'
 
 const Transcriptions = () => {
-  const [socket, setSocket] = useState(null);
   const [fileList, setFileList] = useState([]);
   const [selectedFile, setSelectedFile] = useState("");
   const [onUploadClick, setOnUploadClick] = useState(false)
@@ -26,9 +21,11 @@ const Transcriptions = () => {
   const [fileIdUploading, setFileIdUploading] = useState(null)
   const[uploadPercentage, setUploadPercentage] = useState(null)
   const  [selectedMetric,  setSelectedMetric] = useState(null);
-  const [progress, setProgress]= useState(null)
+  const [progress, setProgress]= useState({})
   const token = useSelector((state) => state?.user?.userData?.access_token)
-
+const [verificationModal, setVerificationModal] = useState(false)
+const [onDeleteClick, setOnDeleteClick] = useState(false)
+const  [fileIdToBeDeleted,setFileIdToBeDeleted] = useState()
   const deleteFileDueToProcessingError = async (fileId) => {
     try{
     const res = await axios.delete(`${baseUrl()}/api/audio-files/${fileId}`);
@@ -39,6 +36,7 @@ const Transcriptions = () => {
   if(index !== -1 && _copy[index]){
     
     setFileList(...[_copy.filter((e) => e.fileId !== fileId)])
+
   }
 
   } else {
@@ -68,65 +66,17 @@ const Transcriptions = () => {
       alert('File Upload not available')
       return;
     }
-    const newSocket = null
-  //   const newSocket = io("http://localhost:5005",{
-  //     query: { token }
-  // });
-    setSocket(newSocket);
+
     return () => {
-      if(newSocket){
-      newSocket.disconnect();
-      }
+      
     };
   }, []);
 
-  useEffect(() => {
-    if (!socket) return;
-    socket.on("connect", () => {
-      console.log("Connected to server");
-    });
-    socket.on("disconnect", () => {
-      console.log("Disconnected from server");
-    });
-    socket.on("reconnect", () => {
-      console.log("Reconnected to server");
-    });
 
-    socket.on("upload_success", async (data) => {
-      console.log('data from upload_success', data)
-      try {
-        const res = await axios.put(`${baseUrl()}/api/audio-files`, {
-          fileUrl: data.url,
-          fileId: data.fileId,
-          status: "uploaded",
-        });
-        if (res.status === 200) {
-          await getFiles();
-        }
-      } catch (error) {
-        console.error("Error:", error);
-      }
-    });
-
-  
-    socket.on("error", (error) => {
-      console.error("Socket error:", error);
-    });
-
-    socket.on('chunk_ack', () => {
-      console.log('chunk_ack')
-    })
-
-    return () => {
-      socket.off("connect");
-      socket.off("disconnect");
-      socket.off("reconnect");
-      socket.off("error");
-    };
-  }, [socket]);
 
   const handleShowTranscription = (id) => {
     console.log("Show transcription for item", id);
+    setVerificationModal(true)
   };
 
   const handleUploadClick = () => {
@@ -134,169 +84,95 @@ const Transcriptions = () => {
   };
 
   const handleFileChange = (event) => {
-    console.log('event',event.target.files[0])
     setSelectedFile(event.target.files[0]);
     event.target.value = null;
     setOnUploadClick(true)
   };
 
-  const handleNext = () => {
+  // Upon successful upload or when an error occurs
+const resetProgress = (fileId) => {
+  setProgress(prev => {
+      const updatedProgress = { ...prev };
+      delete updatedProgress[fileId]; // Remove the progress entry for this file
+      return updatedProgress;
+  });
+};
 
-    if(modalIndex === 1){
-      setOnUploadClick(false)
-      uploadFile(selectedFile)
-      setModalIndex(null)
-    } else {
-      setModalIndex(modalIndex + 1);
-    }
-  };
 
 
 
 
   const uploadFile = async (file) => {
-  //   try {
-  //     const response = await axios.post(`${baseUrl()}/api/audio-file`, { status: "processing", userMetricId :selectedMetric  });
-  //     if (response.status === 200 && response.data) {
-  //         setFileIdUploading(response.data.fileId);
-  //         setFileList((prev) => [...prev, response.data]);
-  //         socket.emit('start_upload', { fileName: file.name, fileId: response.data.fileId });
-  //     }
-  // } catch (error) {
-  //     console.error('Upload initialization failed', error);
-  //     alert('Failed to start upload. Please try again.');
-  // }
-
-  try {
-    console.log('file', file)
-    await uploadFileToGCS(file, setProgress)
-
-    // const response = await axios.post(`${baseUrl()}/api/audio-file`, { status: "processing", userMetricId :selectedMetric  });
-    // if (response.status === 200 && response.data) {
-    //     setFileIdUploading(response.data.fileId);
-    //     setFileList((prev) => [...prev, response.data]);
-    //     socket.emit('start_upload', { fileName: file.name, fileId: response.data.fileId });
-    // }
-} catch (error) {
-    console.error('Upload initialization failed', error);
-    alert('Failed to start upload. Please try again.');
-}
-    
-  }
-
-  useEffect(() => {
-    console.log('progress from useEffect', progress)
-  },[progress])
-
- 
-
-
- 
-
-  const startChunkUpload = async (file, fileId) => {
-    try{
-  if(fileId && file){
-      const CHUNK_SIZE = 512 * 1024;
-      const reader = new FileReader();
-      // let uploaded = 0; // To keep track of the number of bytes uploaded
-      reader.onload = (event) => {
-        const chunk = reader.result;
-        // const chunk = event.target.result;
-        // uploaded += chunk.byteLength; // Update the uploaded bytes
-        socket.emit("upload_chunk", {
-          chunk,
-          fileName: file.name,
-          fileId: fileId,
+    let fileId = null; // This will hold the ID of the file entry
+    try {
+        // Create an entry in the database with the initial status 'processing'
+        const initResponse = await axios.post(`${baseUrl()}/api/audio-file`, {
+            status: "processing",
+            userMetricId: selectedMetric
         });
-  //       const progressPercentage = (uploaded / file.size) * 100;
-  // setProgress({fileId: fileId, progressPercentage : progressPercentage}); // Update the progress state
 
-  // if (uploaded < file.size) {
-  //   const nextChunk = file.slice(uploaded, uploaded + CHUNK_SIZE);
-  //   reader.readAsArrayBuffer(nextChunk);
-  // } else {
-  //   socket.emit("end_upload", { fileName: file.name });
-  //   setProgress(100); // Ensure the progress is set to 100% at the end
-  // }
+        if (initResponse.status === 200 && initResponse.data) {
+            fileId = initResponse.data.fileId;
+            setFileIdUploading(fileId);
+            setFileList(prev => [...prev, initResponse.data]);
+            const { name, type} = file
+            const dateTimeString = new Date().toISOString().replace(/:/g, '-').replace(/\..+/, '');
+            const uniqueFileName = `${dateTimeString}_${fileId}_${name}`;
+            // Upload the file using the pre-signed URL
+            const uploadStatus = await uploadFileToGCS(file,fileId, uniqueFileName,type , progress => {
+              setProgress(prev => ({
+                ...prev,
+                [progress.fileId]: progress.percentCompleted
+            }));
+            });
+console.log('uploadStatus',uploadStatus)
+            if (uploadStatus) {
+              // Generate a unique file name
+           
 
+          
+                // If the upload is successful, update the status in the database to 'uploaded'
+                const updateResponse = await axios.put(`${baseUrl()}/api//audio-files`, {
+                    fileId: fileId,
+                    fileUrl: uniqueFileName,
+                    status: 'uploaded'
+                });
 
-        if (reader.readyState !== FileReader.DONE) {
-          const nextChunk = file.slice(
-            reader.loaded,
-            reader.loaded + CHUNK_SIZE
-          );
-          reader.readAsArrayBuffer(nextChunk);
-        } else {
-          socket.emit("end_upload", { fileName: file.name });
+                
+
+                if (updateResponse.status === 200 && updateResponse.data) {
+                  console.log(updateResponse.data)
+                  resetProgress(fileId)
+                  setFileList(prev => {
+                    const updatedList = [...prev]
+                    const index = updatedList.findIndex((e) => e.fileId === updateResponse.data.fileId)
+                    if(index !== -1){
+                      updatedList[index] = {...updatedList[index], ...updateResponse.data}
+                   
+                    }
+                    return updatedList
+                  });
+                    console.log('File status updated to uploaded.');
+                } else {
+                    throw new Error('Failed to update file status.');
+                }
+            }
         }
-      };
-      reader.onerror = () => {
-        console.log('fileId from startChunkUpload onerror', fileId)
-        console.log('file from startChunkUpload onerror', file)
-        deleteFileDueToProcessingError(fileId)
-        setSelectedFile(null);
-
-      }
-      reader.readAsArrayBuffer(file.slice(0, CHUNK_SIZE));
-  }
-  else{
-    console.error('error while uploading file')
-    console.log('fileId from startChunkUpload', fileId)
-    console.log('file from startChunkUpload', file)
-    setSelectedFile(null);
-  }
-}
-catch(e){
-  alert(e)
-  console.log('error while startChunkUpload',e)
-  setSelectedFile(null);
-  if(fileId){
-    deleteFileDueToProcessingError(fileId)
-  }
-}
-  };
-
-  const deleteFile = async (fileId) => {
-    try{
-      if(!fileId){
-        throw new Error('File Id not Found')
-      }
-    const response = await axios.delete(`${baseUrl()}/api/audio-file`, { data : {fileId: fileId} });
-  console.log('response from deleteFile', response)  
-  }
-    catch(e){
-      alert(e)
+    } catch (error) {
+        console.error('Upload process failed', error);
+        alert('Failed to start upload. Please try again.');
+        
+        // Clean up any created file record on error if the file was actually created
+        if (fileId) {
+            deleteFileDueToProcessingError(fileId);
+        }
     }
-  }
+}
 
-  useEffect(() => {
-    console.log('selectedFile',selectedFile)
-    if (!socket) return;
-    socket.on('start_ack', () => {
-      startChunkUpload(selectedFile, fileIdUploading)})
 
-    socket.on('chunk_did_not_received', (data) => {
-      console.log('upload failed')
-      setFileIdUploading(null)
-      setSelectedFile(null)
-      // alert('failed to upload file to server')
-      // if(data.fileId){
-      //   deleteFileDueToProcessingError(data.fileId)
+ 
 
-      // }
-    })
-    socket.on('upload_failed', (data) => {
-      console.log('upload failed for data', data)
-      setFileIdUploading(null)
-      setSelectedFile(null)
-      alert('failed to upload file to server')
-      if(data.fileId){
-        deleteFileDueToProcessingError(data.fileId)
 
-      }
-    })
-
-      },[selectedFile, fileIdUploading, socket])
 
   return (
     <Container maxWidth="lg" className="p-4">
@@ -333,14 +209,19 @@ catch(e){
       <Divider />
       <br />
       {fileList && Array.isArray(fileList) &&  fileList.length === 0
-        ? "No file"
+        ? <div class="flex items-center justify-center">
+        <h1 class="text-xl font-bold text-gray-200">Welcome! Please upload a file to begin.</h1>
+    </div>
         : fileList.map((item) => (
             <Item
               
-              key={item.id}
+              key={item.fileId}
               item={item}
               onShowTranscription={handleShowTranscription}
-              onDeleteClick={() => {deleteFileDueToProcessingError(item.fileId)}}
+              onDeleteClick={() => {
+                setOnDeleteClick(true)
+                setFileIdToBeDeleted(item.fileId)
+              }}
               progress={progress}
             />
           ))}
@@ -355,6 +236,11 @@ catch(e){
       selectedMetric={selectedMetric}
       setSelectedMetric = {setSelectedMetric}
      />}
+     {verificationModal && <VerificationModal onUploadClick={verificationModal} setOnUploadClick={setVerificationModal}/>}
+     {onDeleteClick && <DeleteConfirmationModal onUploadClick = {onDeleteClick} fileIdToBeDeleted = {fileIdToBeDeleted} setFileIdToBeDeleted = {setFileIdToBeDeleted} setOnUploadClick = {setOnDeleteClick} onDeleteClick = {(fileId) => deleteFileDueToProcessingError(fileId).then(() => setOnDeleteClick(false)).catch((e)=> {
+      console.error('error while deleting file', e)
+     }).finally(() => {setOnDeleteClick(false)
+      setFileIdToBeDeleted(null)})}/>}
     </Container>
   );
 };

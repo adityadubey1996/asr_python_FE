@@ -1,10 +1,13 @@
-import {axiosInstance as axios} from './axios-interceptor';
+import {axiosInstance as axios11} from './axios-interceptor';
 import { baseUrl } from './url';
 
-export const getPresignedUrl = async (fileName) => {
+
+
+export const getPresignedUrl = async (fileName, contentType) => {
     try {
-        const response = await axios.get(`${baseUrl()}/api/generate-presigned-url`, {
-            params: { fileName }
+        console.log('fileName contentType', contentType, fileName)
+        const response = await axios11.post(`${baseUrl()}/api/cloud-postsignedUrl`, {
+         fileName, contentType 
         });
         return response.data.signedUrl;
     } catch (error) {
@@ -13,30 +16,49 @@ export const getPresignedUrl = async (fileName) => {
     }
 };
 
-export const uploadFileToGCS = async (file, onProgress = () => {}) => {
-    try {
-        const url = await getPresignedUrl(file.name);
-        if(!url){
-            throw Error('Url not found')
-        }
-        const headers = {
-            'Content-Type': file.type || 'application/octet-stream'
-        };
-        const result = await axios.put(url, file, { 
-            headers,
-            onUploadProgress: progressEvent => {
-                if (progressEvent.lengthComputable) {
-                    const percentCompleted = Math.round((progressEvent.loaded * 100) / progressEvent.total);
-                    onProgress(percentCompleted); // Callback to update progress in the UI
-                }
+export const uploadFileToGCS = async (file, fileId, fileName,fileType,  onProgress = () => {}) => {
+ 
+    return new Promise(async (resolve, reject) => {
+        try {
+            const url = await getPresignedUrl(fileName, fileType);
+            if (!url) {
+                throw Error('URL not found');
             }
-        });
-        console.log('File uploaded successfully', result);
-        onProgress(100); // Ensure the completion is set at the end
-  
-    
-    } catch (error) {
-        console.error('Failed to upload file', error);
-        onProgress(0); // Reset or handle error state if progress callback is provided
-    }
+
+            const xhr = new XMLHttpRequest();
+            xhr.open('PUT', url, true);
+            xhr.setRequestHeader('Content-Type', fileType || 'application/octet-stream');
+
+            // Handle the progress event
+            xhr.upload.onprogress = function(event) {
+                if (event.lengthComputable) {
+                    const percentCompleted = Math.round((event.loaded * 100) / event.total);
+                    
+                    onProgress({percentCompleted,fileId}); // Callback to update progress in the UI
+                }
+            };
+
+            // Handle the response from the server
+            xhr.onload = function() {
+                if (xhr.status === 200) {
+                    console.log('File uploaded successfully');
+                    resolve({ status: 'success', data: xhr.responseText }); // Return an object with status and data
+                } else {
+                    reject(new Error(`HTTP error! status: ${xhr.status}`));
+                }
+            };
+
+            // Handle network errors
+            xhr.onerror = function() {
+                console.error('Error during the upload process.');
+                reject(new Error('Network or other error during the upload process.'));
+            };
+
+            xhr.send(file);
+        } catch (error) {
+            console.error('Failed to upload file', error);
+            onProgress(null); // Reset or handle error state if progress callback is provided
+            reject(error);
+        }
+    });
 };

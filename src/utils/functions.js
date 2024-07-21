@@ -1,9 +1,10 @@
  import {questions} from './constants'
- export const getFileNameFromURL = (url) => {
-    const fileNameWithPrefix = url.substring(url.lastIndexOf('/') + 1);
-    const fileName = fileNameWithPrefix.substring(fileNameWithPrefix.indexOf('_') + 1); 
+
+  export const getFileNameFromURL = (url) => {
+    const fileNameWithPrefix = url.substring(url.lastIndexOf('/') + 1); // Get the part of the URL after the last '/'
+    const fileName = fileNameWithPrefix.substring(fileNameWithPrefix.lastIndexOf('_') + 1); // Extract the part after the last '_'
     return fileName;
-  };
+};
 
   export const getFileExtensionFromURL = (url) => {
     const fileName = url.substring(url.lastIndexOf('/') + 1);

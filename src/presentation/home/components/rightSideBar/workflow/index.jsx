@@ -48,7 +48,7 @@ const navigate  = useNavigate()
  
 
   return (
-    <Container maxWidth="lg" className="p-4">
+    <Container  maxWidth="lg" className="p-4">
     <Box
        display="flex"
        justifyContent="space-between"
@@ -56,7 +56,7 @@ const navigate  = useNavigate()
        mb={3}
      >
         <Typography variant="h6" fontWeight="bold" className="text-gray-200">
-         <FontAwesomeIcon  /> Workflow
+         Workflow
        </Typography>
        <Button
             
@@ -84,7 +84,7 @@ const navigate  = useNavigate()
       </Box>
       ) : 
         userMetrics.length > 0 && userMetrics.map((metric) => {
-          return   <WorkFlowTile  metric = {metric} deleteMetricFromList = {(metricId) => {
+          return   <WorkFlowTile  key = {metric.userMetricId} metric = {metric} deleteMetricFromList = {(metricId) => {
             const _metricList = [...userMetrics]
             setUserMetrics(_metricList.filter((metric) => metric.userMetricId !== metricId))
 
