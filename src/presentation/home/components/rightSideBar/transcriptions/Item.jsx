@@ -19,7 +19,6 @@ import { getFileExtensionFromURL, getFileNameFromURL } from "../../../../../util
 
 const Item = ({ item, onShowTranscription, onDeleteClick, progress }) => {
   const [showFullFilename, setShowFullFilename] = useState(false);
-
   const truncateFilename = (filename, length) => {
     return filename.length > length ? `${filename.substring(0, length)}...` : filename;
   };
@@ -28,7 +27,6 @@ const Item = ({ item, onShowTranscription, onDeleteClick, progress }) => {
   return (
     <div className="relative flex items-center p-4 mb-4 border border-gray-800 rounded-lg bg-gray-800">
      <div className="absolute top-0 left-0 h-full bg-gray-700 opacity-50 rounded-lg"></div>
-
      <div style={{ width: progress[item.fileId] ? `${progress[item.fileId]}%` : '0%' }} className="absolute top-0 left-0 h-full bg-blue-500 rounded-lg transition-width duration-200 ease-in-out"></div>
       <Checkbox className="mr-4" style={{color : grey[100]}}/>
       <div className="flex flex-1">

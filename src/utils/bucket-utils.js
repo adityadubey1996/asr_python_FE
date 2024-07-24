@@ -44,6 +44,8 @@ export const uploadFileToGCS = async (file, fileId, fileName,fileType,  onProgre
                     console.log('File uploaded successfully');
                     resolve({ status: 'success', data: xhr.responseText }); // Return an object with status and data
                 } else {
+                    onProgress({percentCompleted : null,fileId})
+
                     reject(new Error(`HTTP error! status: ${xhr.status}`));
                 }
             };
@@ -51,13 +53,15 @@ export const uploadFileToGCS = async (file, fileId, fileName,fileType,  onProgre
             // Handle network errors
             xhr.onerror = function() {
                 console.error('Error during the upload process.');
+                onProgress({percentCompleted : null,fileId})
+
                 reject(new Error('Network or other error during the upload process.'));
             };
 
             xhr.send(file);
         } catch (error) {
             console.error('Failed to upload file', error);
-            onProgress(null); // Reset or handle error state if progress callback is provided
+            onProgress({percentCompleted : null,fileId})
             reject(error);
         }
     });

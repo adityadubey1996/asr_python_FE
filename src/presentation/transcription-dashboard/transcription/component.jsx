@@ -10,6 +10,7 @@ export const MainContent = () => {
     const [subtitle, setSubtitles] = useState([])
     const [isPlaying, setIsPlaying] = useState(false);
     const [subTitleSelectedTime, setSubTitleSelectedTime] = useState(null)
+    const [error, setError] = useState(null)
     const audioRef = useRef(null); 
     useEffect(() => {
         async function testign11(){
@@ -29,15 +30,16 @@ export const MainContent = () => {
                         return response.text();
                     })
                     .then(data => {
+                        console.log('data', data)
                         const parsedSubtitles = parseSRT(data);
                         console.log('parsedSubtitles',parsedSubtitles)
                         
                         setSubtitles(parsedSubtitles);
-                        // setError(null);
+                        setError(null);
                     })
                     .catch(err => {
                         console.error('Error fetching or parsing the SRT file:', err);
-                        // setError(err.message);
+                        setError(err.message);
                         setSubtitles([]);
                     });
             };
@@ -62,7 +64,8 @@ export const MainContent = () => {
       <h2 className="text-2xl font-semibold mb-4">Transcript</h2>
     </div>
     <div className="flex-1 overflow-y-scroll p-4 h-4/6">
-        <TranscriptionItems subtitles={subtitle} setCurrentTime={setCurrentTime} currentTime={currentTime} togglePlayPause={setIsPlaying} setSubTitleSelectedTime={setSubTitleSelectedTime} audioRef={audioRef}/> 
+        {error ? <div>Error while Downloading transcription</div> :         <TranscriptionItems subtitles={subtitle} setCurrentTime={setCurrentTime} currentTime={currentTime} togglePlayPause={setIsPlaying} setSubTitleSelectedTime={setSubTitleSelectedTime} audioRef={audioRef}/> 
+}
 
 
 
@@ -73,7 +76,7 @@ export const MainContent = () => {
     </div> */}
     </div>
 
-        <MediaPlayer audioUrl={"https://drive.google.com/file/d/1TJXVAjGFIBONSwGXrDHrj0CfqVJu8zlw/view?usp=sharing"} currentTime={currentTime} setCurrentTime={setCurrentTime} setIsPlaying={setIsPlaying} isPlaying={isPlaying} subTitleSelectedTime={subTitleSelectedTime} setSubTitleSelectedTime={setSubTitleSelectedTime} audioRef={audioRef}/>
+        <MediaPlayer  currentTime={currentTime} setCurrentTime={setCurrentTime} setIsPlaying={setIsPlaying} isPlaying={isPlaying} subTitleSelectedTime={subTitleSelectedTime} setSubTitleSelectedTime={setSubTitleSelectedTime} audioRef={audioRef}/>
     
   </div>
 

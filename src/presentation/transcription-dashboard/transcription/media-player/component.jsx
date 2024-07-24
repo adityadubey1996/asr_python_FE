@@ -6,7 +6,7 @@ export const MediaPlayer = ({currentTime, setCurrentTime, isPlaying, setIsPlayin
     const [isLoading, setIsLoading] = useState(false);
     const [audioUrl, setAudioUrl] = useState(null);
     const [duration, setDuration] = useState(0);
-
+    const [error, setError] = useState(null)
 
    
 
@@ -45,10 +45,13 @@ export const MediaPlayer = ({currentTime, setCurrentTime, isPlaying, setIsPlayin
                 const result = await axios.get(`${baseUrl()}/api/generate-presigned-url`, {
                     params: { fileName } // Ensures proper encoding
                 });
-
+                console.log('result from fetchSignedUrl',result )
                 setAudioUrl(result.data.signedUrl);
             } catch (error) {
-                console.error('Error fetching signed URL:', error);
+                console.log('Error while fetching URL', error)
+                console.error('Error fetching signed URL: from media player', error);
+                setError(error)
+
             } finally {
                 setIsLoading(false);
             }
@@ -68,6 +71,13 @@ export const MediaPlayer = ({currentTime, setCurrentTime, isPlaying, setIsPlayin
 
     if (isLoading) {
         return <div>Loading...</div>;
+    }
+    if(error){
+        return (
+            <div className="flex flex-col items-center justify-center space-y-2 p-4">
+                Error while downloading File
+</div> 
+        )
     }
 
     return (
