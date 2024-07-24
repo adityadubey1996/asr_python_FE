@@ -1,6 +1,6 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import baseUrl from "../utils/url";
-import axios from "../utils/axios-interceptor";
+import  {axiosInstance as axios, baseUrl} from 'utils'
+
 
 
 
@@ -16,9 +16,7 @@ import axios from "../utils/axios-interceptor";
         throw new Error("Token not available");
       }
   try{
-      const response = await axios.get(`/api/metric/questions`, {
-       
-      });
+      const response = await axios.get(`/api//userMetrics`);
   
       if (response.status === 200) {
         return response.data;
@@ -32,13 +30,13 @@ import axios from "../utils/axios-interceptor";
     }}
   );
 
-export const saveAnswers = createAsyncThunk(
+export const createMetric = createAsyncThunk(
   "metrics/saveAnswers",
-  async ({ answers }, { rejectWithValue }) => {
+  async ({ answers, title }, { rejectWithValue }) => {
     try {
       const response = await axios.post(
-        `/api/metrics/user-metrics`, 
-        answers
+        `/api/userMetrics`, 
+        {customSettings :  answers, workflowTitle :title }
       );
       if (response.status == 200) {
         return answers;
@@ -55,13 +53,14 @@ export const getUserMetrics = createAsyncThunk(
     console.log('getState() from getUserMetrics',getState() )
     const user = getState().user;  // Access the latest user state directly from the store
     const token = user?.userData?.access_token;
+    console.log('user', user)
 
     if (!token) {
       throw new Error("Token not available");
     }
     console.log('inside getUserMetrics')
     try {
-    const response = await axios.get(`/api/metrics/userMetrics`);
+    const response = await axios.get(`/api/userMetrics`);
    
       if (response.status === 200) {
         return response.data;
@@ -98,7 +97,7 @@ const metricsSlice = createSlice({
         state.error = action.payload;
         state.loading = false;
       })
-      .addCase(saveAnswers.fulfilled, (state, action) => {
+      .addCase(createMetric.fulfilled, (state, action) => {
         state.userAnswers = action.payload;
       });
       builder

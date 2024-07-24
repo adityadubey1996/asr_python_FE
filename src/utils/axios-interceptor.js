@@ -1,6 +1,6 @@
 // axios-setup.js
 import axios from 'axios';
-import baseUrl from './url';
+import {baseUrl} from './url';
 import { useHistory } from 'react-router-dom';
 
 const axiosInstance = axios.create({
@@ -37,4 +37,4 @@ axiosInstance.interceptors.response.use(
   }
 );
 
-export default axiosInstance;
+export  {axiosInstance};

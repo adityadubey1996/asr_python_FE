@@ -1,5 +1,5 @@
 // Item.js
-import React, {useState} from "react";
+import React, {useEffect, useState} from "react";
 import Checkbox from "@mui/material/Checkbox";
 import IconButton from "@mui/material/IconButton";
 import EditIcon from "@mui/icons-material/Edit";
@@ -15,31 +15,33 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import { FormatSize } from "@mui/icons-material";
 import { red ,grey } from "@mui/material/colors";
-import { getFileExtensionFromURL, getFileNameFromURL } from "../../../../utils/functions";
+import { getFileExtensionFromURL, getFileNameFromURL } from "../../../../../utils/functions";
 
-const Item = ({ item, onShowTranscription }) => {
+const Item = ({ item, onShowTranscription, onDeleteClick, progress }) => {
   const [showFullFilename, setShowFullFilename] = useState(false);
 
   const truncateFilename = (filename, length) => {
     return filename.length > length ? `${filename.substring(0, length)}...` : filename;
   };
 
+
   return (
-    <div className="flex items-center p-4 mb-4 border border-gray-800 rounded-lg bg-gray-800">
+    <div className="relative flex items-center p-4 mb-4 border border-gray-800 rounded-lg bg-gray-800">
+     <div className="absolute top-0 left-0 h-full bg-gray-700 opacity-50 rounded-lg"></div>
+
+     <div style={{ width: progress[item.fileId] ? `${progress[item.fileId]}%` : '0%' }} className="absolute top-0 left-0 h-full bg-blue-500 rounded-lg transition-width duration-200 ease-in-out"></div>
       <Checkbox className="mr-4" style={{color : grey[100]}}/>
       <div className="flex flex-1">
         <div>
           {" "}
           <span className="mr-4 font-semibold text-gray-200">
           {showFullFilename ? getFileNameFromURL(item.fileUrl) : truncateFilename(getFileNameFromURL(item.fileUrl), 20)}
-            {/* {getFileNameFromURL(item.fileUrl)} */}
           </span>
           <button onClick={() => setShowFullFilename(!showFullFilename)} className="text-blue-500 hover:text-blue-700 text-sm">
             {showFullFilename ? 'Show Less' : 'Read More'}
           </button>
           <div>
             <span className="mr-4 text-gray-500">
-              {/* <FontAwesomeIcon icon={FormatSize} /> {getFileSize(item.fileUrl)} */}
             </span>
             <span className="mr-4 text-gray-500">
               <FontAwesomeIcon icon={faGlobe} />
@@ -68,12 +70,13 @@ const Item = ({ item, onShowTranscription }) => {
         
 
         <Tooltip title="Delete">
-          <IconButton size="small">
-            <DeleteIcon style={{ color: red[500] }} />
+          <IconButton size="small" onClick={onDeleteClick}>
+            <DeleteIcon style={{ color: red[500] }}  />
           </IconButton>
         </Tooltip>
       </div>
-    </div>
+      </div>
+     
   );
 };
 

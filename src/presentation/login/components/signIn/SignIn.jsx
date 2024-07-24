@@ -2,12 +2,12 @@ import React, { useState } from "react";
 import { TextField, Typography } from "@mui/material";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faInfoCircle } from "@fortawesome/free-solid-svg-icons";
-import axios from "axios";
-import baseUrl from "../../../../utils/url";
+import  {axiosInstance as axios, baseUrl} from 'utils'
+
 import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
-import { userLoginSuccess } from "../../../../reducers/auth.reducer";
-import {getUserMetrics} from '../../../../reducers/metric.reducer'
+import { userLoginSuccess } from "reducers/auth.reducer";
+import {getUserMetrics} from 'reducers/metric.reducer'
 import Cookies from "universal-cookie";
 
 const SignUp = ({ setSignIn }) => {

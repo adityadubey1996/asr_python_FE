@@ -10,8 +10,9 @@ import {
   faRightFromBracket,
   faXmark,
 } from "@fortawesome/free-solid-svg-icons";
-import axios from "../../../../utils/axios-interceptor";
-import baseUrl from "../../../../utils/url";
+import  {axiosInstance as axios, baseUrl} from 'utils'
+
+
 import { useNavigate } from "react-router-dom";
 
 const SignUp = ({ setSignIn }) => {

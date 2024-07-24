@@ -3,8 +3,6 @@ import { useSelector } from "react-redux";
 
 const Header = () => {
   const user = useSelector((state) => state.user);
-  const testing = useSelector((state) => state.user)
-  console.log('testing', testing)
   return (
     <div className="p-5 sticky border h-20 border-gray-800 top-0">
       <div className="flex justify-end">
