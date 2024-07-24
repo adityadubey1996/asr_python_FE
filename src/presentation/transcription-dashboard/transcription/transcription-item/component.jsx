@@ -30,7 +30,7 @@ export const TranscriptionItems = ({ subtitles, currentTime, setCurrentTime, tog
             });
         }
     }, [currentTime, subtitles]);
-if(subtitles && Array.isArray(subtitles) && subtitles.length > 0)
+if(subtitles && Array.isArray(subtitles) && subtitles.length > 0){
     return (
         <div className="flex-1 overflow-y-scroll p-4">
             {subtitles.map((sub, index) => {
@@ -61,4 +61,8 @@ if(subtitles && Array.isArray(subtitles) && subtitles.length > 0)
             })}
         </div>
     );
+        }
+        return (
+            <>No transcription Found</>
+        )
 };

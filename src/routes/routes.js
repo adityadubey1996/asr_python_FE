@@ -37,7 +37,6 @@ const Routing = () => {
   }, [dispatch, user?.access_token])
 
   useEffect(() => {
-console.log('metrics', metrics)
 
   }, [metrics])
 

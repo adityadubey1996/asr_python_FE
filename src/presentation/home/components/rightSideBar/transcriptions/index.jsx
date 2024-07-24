@@ -33,13 +33,8 @@ const navigate = useNavigate();
     const res = await axios.delete(`${baseUrl()}/api/audio-files/${fileId}`);
     if (res.status === 200) {
     
-    const _copy =  [...fileList]
-  const index = _copy.findIndex((e) => e.fileId === fileId)
-  if(index !== -1 && _copy[index]){
-    
-    setFileList(...[_copy.filter((e) => e.fileId !== fileId)])
-
-  }
+  setFileList(currentFiles => currentFiles.filter(file => file.fileId !== fileId));
+ 
 
   } else {
       alert("Something went wrong while deleting the file");
@@ -49,6 +44,15 @@ const navigate = useNavigate();
     alert('something went wrong with error', e)
   }
   }
+
+  useEffect(() => {
+    console.log('fileList', fileList)
+  
+    return () => {
+      
+    }
+  }, [fileList])
+  
 
 
 
@@ -123,6 +127,7 @@ const resetProgress = (fileId) => {
             const uniqueFileName = `${dateTimeString}_${fileId}_${name}`;
             // Upload the file using the pre-signed URL
             const uploadStatus = await uploadFileToGCS(file,fileId, uniqueFileName,type , progress => {
+              console.log('prgress fromu ploadStatus ', progress)
               setProgress(prev => ({
                 ...prev,
                 [progress.fileId]: progress.percentCompleted
@@ -162,7 +167,7 @@ const resetProgress = (fileId) => {
         }
     } catch (error) {
         console.error('Upload process failed', error);
-        alert('Failed to start upload. Please try again.');
+        alert('Upload process failed');
         
         // Clean up any created file record on error if the file was actually created
         if (fileId) {
