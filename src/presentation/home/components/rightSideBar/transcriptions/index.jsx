@@ -11,6 +11,7 @@ import {axiosInstance as axios,baseUrl, uploadFileToGCS, } from 'utils'
 import UploadModal from './UploadModal'
 import VerificationModal from "components/confirmModal";
 import DeleteConfirmationModal from 'components/deleteConfirmModal'
+import { useNavigate } from "react-router-dom";
 
 const Transcriptions = () => {
   const [fileList, setFileList] = useState([]);
@@ -26,6 +27,7 @@ const Transcriptions = () => {
 const [verificationModal, setVerificationModal] = useState(false)
 const [onDeleteClick, setOnDeleteClick] = useState(false)
 const  [fileIdToBeDeleted,setFileIdToBeDeleted] = useState()
+const navigate = useNavigate();
   const deleteFileDueToProcessingError = async (fileId) => {
     try{
     const res = await axios.delete(`${baseUrl()}/api/audio-files/${fileId}`);
@@ -76,7 +78,8 @@ const  [fileIdToBeDeleted,setFileIdToBeDeleted] = useState()
 
   const handleShowTranscription = (id) => {
     console.log("Show transcription for item", id);
-    setVerificationModal(true)
+    navigate('/transcription-dashboard/101')
+    // setVerificationModal(true)
   };
 
   const handleUploadClick = () => {
@@ -125,7 +128,6 @@ const resetProgress = (fileId) => {
                 [progress.fileId]: progress.percentCompleted
             }));
             });
-console.log('uploadStatus',uploadStatus)
             if (uploadStatus) {
               // Generate a unique file name
            

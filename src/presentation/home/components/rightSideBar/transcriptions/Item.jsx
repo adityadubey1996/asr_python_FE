@@ -18,7 +18,6 @@ import { red ,grey } from "@mui/material/colors";
 import { getFileExtensionFromURL, getFileNameFromURL } from "../../../../../utils/functions";
 
 const Item = ({ item, onShowTranscription, onDeleteClick, progress }) => {
-  console.log('progress from Item', progress)
   const [showFullFilename, setShowFullFilename] = useState(false);
 
   const truncateFilename = (filename, length) => {
